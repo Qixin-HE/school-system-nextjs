@@ -1,4 +1,4 @@
-import { Layout, Menu, Button, Tooltip } from 'antd';
+import { Layout, Menu, Button, Tooltip, Dropdown } from 'antd';
 import {
     AuditOutlined,
     MessageOutlined,
@@ -27,6 +27,22 @@ const Dashboard = ({ children }) => {
     const [isCollapsed, setIsCollased] = useState(false);
     const { Header, Content, Footer, Sider } = Layout;
     const { SubMenu } = Menu;
+
+    const userDropDownMenu = (
+        <Menu>
+            <Menu.Item>
+                <a target="_blank" rel="noopener noreferrer" href="">
+                    Profile(not implemented)
+                </a>
+            </Menu.Item>
+            <Menu.Item>
+                <a target="_blank" rel="noopener noreferrer" href="">
+                    Logout(not implemented)
+                </a>
+            </Menu.Item>
+
+        </Menu>
+    );
     return (
         <>
             <Layout>
@@ -104,13 +120,19 @@ const Dashboard = ({ children }) => {
                         }
                     </div>
 
-                    <div style={{position: "fixed", top: 0, right: "30px"}}>
+                    <div style={{ position: "fixed", top: 0, right: "30px" }}>
                         <Tooltip title="Notification">
-                            <Button ghost style={{ borderColor: "black", left: "-15px" }} size="large" icon={<BellOutlined />} />
+                            
+                                <Button ghost style={{ borderColor: "black", left: "-15px" }} size="large" icon={<BellOutlined />} />
+                            
+
                         </Tooltip>
-                        <Tooltip title="User">
-                            <Button shape="circle" icon={<UserOutlined />} />
-                        </Tooltip>
+                        
+                        <Dropdown overlay={userDropDownMenu} arrow>
+                        <Button shape="circle" icon={<UserOutlined />} />
+                            </Dropdown>
+                            
+                       
 
                     </div>
 
