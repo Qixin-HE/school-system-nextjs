@@ -4,7 +4,7 @@ import { Row, Col, Form, Input, Checkbox, Button, Radio } from 'antd';
 import { useState } from 'react';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import axios from 'axios';
-// import aes from 'crypto-js/aes';
+import { useRouter } from 'next/router'
 
 export default function SignInPage() {
   const validateMessages = {
@@ -18,6 +18,7 @@ export default function SignInPage() {
     },
   };
   var AES = require("crypto-js/aes");
+  const router = useRouter();
 
   const onFormSubmit = (values: any) => {
     const loginObject = {
@@ -32,6 +33,7 @@ export default function SignInPage() {
       var res = response.data;
       localStorage.setItem('token', res.data.token);
       alert("Sign in successfully, token:" + res.data.token);
+      router.push("/OverviewPage")
     })
     .catch(function (error) {
       console.log(error);
