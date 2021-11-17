@@ -1,5 +1,7 @@
 .container {
-  padding: 0 2rem;
+  position: relative;
+  width: 1200px;
+  margin: 0 auto;
 }
 
 .main {
@@ -114,3 +116,15 @@
     flex-direction: column;
   }
 }
+.menu {
+  display: flex;
+  justify-content: space-around;
+  list-style-type: none;
+  font-size: 20px;
+}
+.menu li a {
+  color: #8C929C !important;
+}
+/* #menu ul li a{
+  color: #8C929C !important;
+} */

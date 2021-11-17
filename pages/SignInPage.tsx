@@ -1,11 +1,10 @@
 import Link from 'next/link'
-import { Row, Col, Form, Input, Checkbox, Button, Radio } from 'antd'
-// stuck here for a while (the cols just piled up but not in a row), then find the reference below:
-// https://www.kindacode.com/article/how-to-use-ant-design-in-a-next-js-project/
-import 'antd/dist/antd.css';
-//no toggle button in antd? - it is "radio" in antd
-
+import Head from "next/head";
+import { Row, Col, Form, Input, Checkbox, Button, Radio } from 'antd';
+import { useState } from 'react';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import axios from 'axios';
+// import aes from 'crypto-js/aes';
 
 export default function SignInPage() {
   const validateMessages = {
@@ -18,37 +17,70 @@ export default function SignInPage() {
       range: '${label} must be between ${min} and ${max}',
     },
   };
-  const onFinish = (values: any) => {
-    console.log('Received values of form: ', values);
+  var AES = require("crypto-js/aes");
+
+  const onFormSubmit = (values: any) => {
+    const loginObject = {
+      email: values.username,
+      password: AES.encrypt(values.password, 'cms').toString(),
+      role: role
+    }
+    //console.log(loginObject)
+    axios.post('http://ec2-13-239-60-161.ap-southeast-2.compute.amazonaws.com:3001/api/login', loginObject)
+    .then(function (response) {
+      //console.log(response.data.token);
+      var res = response.data;
+      localStorage.setItem('token', res.data.token);
+      alert("Sign in successfully, token:" + res.data.token);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
   };
-  // const layout = {
-  //   labelCol: { span: 8 },
-  //   wrapperCol: { span: 16 },
-  // };
+
+  const [role, setRole] = useState("manager");
+
+  
+
+
 
   return (
     <>
+      <Head>
+        <link
+          rel="preload"
+          href="/fonts/BebasNeue-Regular.ttf"
+          as="font"
+          crossOrigin=""
+        />
+
+      </Head>
       <Row justify="center">
         <Col span={6}></Col>
         <Col span={12}>
           <h1 style={{
-            fontWeight: 600,
-            transform: "scale(1, 1.2)",
-            // what is the font?
+            // fontWeight: 600,
+            fontSize: "38px",
+            lineHeight: "1.23",
+            fontFamily: "Bebas Neue",
             justifyContent: "center",
             display: "flex"
           }}>COURSE MANAGEMENT ASSISTANT</h1>
-          <Radio.Group style={{ paddingBottom: "20px" }} >
-            <Radio.Button value="student">Student</Radio.Button>
-            <Radio.Button value="teacher">Teacher</Radio.Button>
-            <Radio.Button value="manager">Manager</Radio.Button>
-          </Radio.Group>
           <Form
             name="normal_login"
             className="login-form"
             initialValues={{ remember: true }}
-            onFinish={onFinish}
+            onFinish={onFormSubmit}
           >
+            <Radio.Group style={{ paddingBottom: "20px" }} onChange={
+              e => {
+                setRole(e.target.value)
+              }} defaultValue="manager">
+              <Radio.Button value="student">Student</Radio.Button>
+              <Radio.Button value="teacher">Teacher</Radio.Button>
+              <Radio.Button value="manager">Manager</Radio.Button>
+            </Radio.Group>
+
             <Form.Item
               name="username"
               rules={[{ required: true, message: 'Please input your Username!' }]}
@@ -63,6 +95,7 @@ export default function SignInPage() {
                 prefix={<LockOutlined className="site-form-item-icon" />}
                 type="password"
                 placeholder="Password"
+                // onChange={e => setPassword(e.target.value)}
               />
             </Form.Item>
             <Form.Item>
