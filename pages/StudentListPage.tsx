@@ -19,7 +19,7 @@ export async function getStaticProps() {
         url: 'http://ec2-13-239-60-161.ap-southeast-2.compute.amazonaws.com:3001/api/students?page=1&limit=20',
         headers: {
             'Authorization': `Bearer ${token}`
-            //'Authorization': "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJyb2xlIjoibWFuYWdlciIsImlkIjo1MDEsImlhdCI6MTYzNzM3Mjc1MiwiZXhwIjoxNjQ1MTQ4NzUyfQ.8loirW4xt3QgZJm_d7uB76gvO_6LgAwR0JK8h0ocFiw"
+           
         },
         data: ''
     }).then(function (response) {
@@ -49,13 +49,14 @@ const StudentListPage = (props) => {
     //    return  {"name": e.data.student.name}
     // })
     var rows: any = [];
+    var curriculumNames = "";
     json.forEach(e => {
         const obj = {
             id: e.id,
             name: e.name,
             area: e.country,
             email: e.email,
-            selectedCurriculum: e.courses[0].name,
+            selectedCurriculum: e.courses.map(item => item.name).join(","),
             studentType: e.type.name,
             joinTime: e.createdAt
         }
