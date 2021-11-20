@@ -26,7 +26,7 @@ export default function SignInPage() {
       password: AES.encrypt(values.password, 'cms').toString(),
       role: role
     }
-    //console.log(loginObject)
+    console.log(loginObject)
     axios.post('http://ec2-13-239-60-161.ap-southeast-2.compute.amazonaws.com:3001/api/login', loginObject)
     .then(function (response) {
       //console.log(response.data.token);
