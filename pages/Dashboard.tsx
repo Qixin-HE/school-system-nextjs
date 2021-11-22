@@ -84,7 +84,7 @@ const Dashboard = ({ children }: any) => {
             <Layout>
                 <Header style={{ zIndex: 1, width: '100%' }}>
                     <div className="logo">
-                        <h3 style={{ fontFamily: "Bebas Neue", color: "#FFFFFF", position: "fixed", marginTop: "1px" }}>cms</h3>
+                        <h3 style={{ fontFamily: "Bebas Neue", color: "#FFFFFF", position: "absolute", marginTop: "1px" }}>cms</h3>
                     </div>
 
 
@@ -95,7 +95,7 @@ const Dashboard = ({ children }: any) => {
                         }
                     </div>
 
-                    <div style={{ position: "fixed", top: 0, right: "30px" }}>
+                    <div style={{ position: "absolute", top: 0, right: "30px" }}>
                         <Tooltip title="Notification">
 
                             <Button ghost style={{ borderColor: "black", left: "-15px" }} size="large" icon={<BellOutlined />} />

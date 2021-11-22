@@ -7,10 +7,10 @@ import React from 'react';
 
 
 export async function getStaticProps() {
-    var token;
-    if (typeof window !== 'undefined') {
-        token = localStorage.getItem("token");
-    }
+    // var token;
+    // if (typeof window !== 'undefined') {
+    //     token = localStorage.getItem("token");
+    // }
 
 
     var value: any = "";
@@ -18,7 +18,7 @@ export async function getStaticProps() {
         method: 'get',
         url: 'http://ec2-13-239-60-161.ap-southeast-2.compute.amazonaws.com:3001/api/students?page=1&limit=20',
         headers: {
-            'Authorization': `Bearer ${token}`
+            'Authorization': "Bearer "
            
         },
         data: ''
@@ -27,6 +27,7 @@ export async function getStaticProps() {
         console.log("i did try");
         value = response.data;
         //value = response.data;
+        
     }).catch(function (error) {
         // handle error
         console.log(error);
@@ -44,12 +45,30 @@ export async function getStaticProps() {
 };
 
 const StudentListPage = (props) => {
-    const json = JSON.parse(props.data).data.students;
+    console.log(props);
+    const jsonOne = JSON.parse(JSON.stringify(props.data));
+    const json = jsonOne.data.students;
     // const result = json.map(e =>{
     //    return  {"name": e.data.student.name}
     // })
     var rows: any = [];
-    var curriculumNames = "";
+    const calculateJoinTime = (joinTime: String) => {
+        const now = new Date();
+        const then = new Date(joinTime);
+        var Difference_In_Time = now.getTime() - then.getTime();
+
+        // To calculate the no. of days between two dates
+        var years = Difference_In_Time / (1000 * 3600 * 24 * 30 * 12);
+
+        const almostYear = parseInt(years) + 1;
+        
+        if (parseInt((years % 1). toFixed(2). substring(2)) >= 50){
+            return "Almost " + almostYear + " years ago"
+        }else if (parseInt((years % 1). toFixed(2). substring(2)) < 50){
+            return "Over " + parseInt(years) + " years ago"
+        }
+        //return years + " " + parseInt((years % 1). toFixed(2). substring(2))
+    }
     json.forEach(e => {
         const obj = {
             id: e.id,
@@ -58,7 +77,7 @@ const StudentListPage = (props) => {
             email: e.email,
             selectedCurriculum: e.courses.map(item => item.name).join(","),
             studentType: e.type.name,
-            joinTime: e.createdAt
+            joinTime: calculateJoinTime(e.createdAt)
         }
         rows.push(obj);
 
