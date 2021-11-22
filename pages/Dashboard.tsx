@@ -116,8 +116,7 @@ const Dashboard = ({ children }: any) => {
                     <Sider
                         style={{
                             overflow: 'auto',
-                            height: '100vh',
-
+                            minHeight: '100vh',
                             left: 0,
 
                         }}
