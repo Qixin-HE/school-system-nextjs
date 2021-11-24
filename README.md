@@ -15,3 +15,4 @@
 
         Prefer using 'string' when possible.
     结论： 用string。
+3. 为什么要给response写type？是因为怕到时候api返回的东西不一样吗？是出于安全考虑吗？
