@@ -1,77 +1,97 @@
-import Dashboard from "./Dashboard";
+import Dashboard from "../../components/Dashboard";
 import { Space, Breadcrumb, Table } from 'antd';
 import axios from 'axios';
 import Link from 'next/link'
 import { useEffect, useState } from 'react';
 
 
+type StudentTypeName = "tester" | "developer";
 
-export async function getStaticProps() {
-    // var token;
-    // if (typeof window !== 'undefined') {
-    //     token = localStorage.getItem("token");
-    // }
+interface StudentType {
+    id: number,
+    name: StudentTypeName
+}
+interface Course {
+    id: number,
+    courseId: number,
+    name: string, 
+}
+interface Student {
+    createdAt: string,
+    updatedAt: string,
+    id: number,
+    email: string,
+    name: string,
+    country: string,
+    profileId: number,
+    type: StudentType,
+    courses: Course[],
 
 
+}
+interface getStudentResponse {
+    total: number,
+    students: Student[],
+    paginator: ResponsePaginator
+}
 
+interface ResponsePaginator {
+    page: number,
+    limit: number
+}
 
-    //const { data } = await axios(config);
-    return {
-        props: {
-
-        }
-    }
-
-};
+interface StudentListRecord {
+    id: number,
+    name: string,
+    area: string,
+    email: string,
+    selectedCurriculum: string,
+    studentType: string,
+    joinTime: string | undefined
+}
 
 const StudentListPage = () => {
-    //console.log(props);
+    
     const [data, setData] = useState();
     var rows: any = [];
     useEffect(() => {
-        var value;
+        var value:getStudentResponse;
         const token = localStorage.getItem("token");
         console.log("token", token);
-        axios({
-            method: 'get',
-            url: 'http://ec2-13-239-60-161.ap-southeast-2.compute.amazonaws.com:3001/api/students?page=1&limit=20',
-            headers: {
-                'Authorization': `Bearer ${token}`
+        //Axios.get<any, AxiosResponse<any, any>, any> 这个<>之间的是什么？
+        axios.get('http://ec2-13-239-60-161.ap-southeast-2.compute.amazonaws.com:3001/api/students?page=1&limit=20', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).then(function (response) {           
+            value = response.data.data;
+            //console.log(value)
 
-            },
-            data: ''
-        }).then(function (response) {
-            // handle success
-
-            //setData(response.data);
-            value = response.data;
-            //console.log("i did try", data);
         }).catch(function (error) {
             // handle error
             console.log(error);
         }).then(function () {
-            //console.log("data from useEffect", JSON.stringify(data))   
-            const json = value.data.students;
 
-            const calculateJoinTime = (joinTime: String) => {
+            const json: Student[] = value.students;
+
+            const calculateJoinTime = (joinTime: string):string => {
                 const now = new Date();
                 const then = new Date(joinTime);
-                var Difference_In_Time = now.getTime() - then.getTime();
+                var Difference_In_Time: number = now.getTime() - then.getTime();
 
                 // To calculate the no. of days between two dates
-                var years = Difference_In_Time / (1000 * 3600 * 24 * 30 * 12);
+                var years : number = Difference_In_Time / (1000 * 3600 * 24 * 30 * 12);
 
-                const almostYear = parseInt(years) + 1;
+                const almostYear: number = parseInt(years.toString()) + 1;
 
                 if (parseInt((years % 1).toFixed(2).substring(2)) >= 50) {
                     return "Almost " + almostYear + " years ago"
                 } else if (parseInt((years % 1).toFixed(2).substring(2)) < 50) {
-                    return "Over " + parseInt(years) + " years ago"
+                    return "Over " + parseInt(years.toString()) + " years ago"
                 }
+                return "No record."
             }
 
             json.forEach(e => {
-                const obj = {
+                const obj:StudentListRecord = {
                     id: e.id,
                     name: e.name,
                     area: e.country,
@@ -84,59 +104,12 @@ const StudentListPage = () => {
 
             })
             setData(rows);
-            console.log("rows", data)
+            //console.log("rows", data)
         });
 
     }, []);
-    //const jsonOne = JSON.parse(JSON.stringify(props.data));
-
-
-
 
     const { Column, ColumnGroup } = Table;
-
-    // const columns = [
-    //     {
-    //         title: 'No.',
-    //         dataIndex: 'id',
-    //         key: 'id',
-    //     },
-    //     {
-    //         title: 'Name',
-    //         dataIndex: 'name',
-    //         key: 'name',
-    //     },
-    //     {
-    //         title: 'Area',
-    //         dataIndex: 'area',
-    //         key: 'area',
-    //     },
-    //     {
-    //         title: 'Email',
-    //         dataIndex: 'email',
-    //         key: 'email',
-    //     },
-    //     {
-    //         title: 'Selected Curriculum',
-    //         dataIndex: 'selectedCurriculum',
-    //         key: 'selectedCurriculum',
-    //     },
-    //     {
-    //         title: 'Student Type',
-    //         dataIndex: 'studentType',
-    //         key: 'studentType',
-    //     },
-    //     {
-    //         title: 'Join Time',
-    //         dataIndex: 'joinTime',
-    //         key: 'joinTime',
-    //     },
-    //     {
-    //         title: 'Action',
-    //         dataIndex: 'action',
-    //         key: 'action',
-    //     },
-    // ];
 
     return (
         <>

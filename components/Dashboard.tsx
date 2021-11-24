@@ -16,18 +16,31 @@ import {
 import { useState, useEffect } from 'react';
 import Link from 'next/link'
 import React, { ReactNode } from 'react';
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { useRouter } from 'next/router'
+import { url } from 'inspector';
+
+// enum axiosMethod {
+// post =  "post",
+// get = "get"
+// }
 
 
+
+// interface axiosConfig {
+//     method: axiosMethod,
+//     url: String,
+//     headers: object
+//     data?: String
+// }
 
 
 const Dashboard = ({ children }: any) => {
-    const [isCollapsed, setIsCollased] = useState(false);
+    const [isCollapsed, setIsCollased] = useState<boolean>(false);
     const { Header, Content, Footer, Sider } = Layout;
     const { SubMenu } = Menu;
     //React['useEffectLayout'] = React.useEffect;
-    var token:any;
+    var token:String | null;
     if (typeof window !== 'undefined') {
         token = localStorage.getItem("token");
     }
@@ -40,16 +53,11 @@ const Dashboard = ({ children }: any) => {
     const logout = () => {
         console.log("Loging out")
 
-        const config = {
-            method: 'post',
-            url: 'http://ec2-13-239-60-161.ap-southeast-2.compute.amazonaws.com:3001/api/logout',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
-            data: ''
-        };
-        axios(config)
-            .then(function (response) {
+        axios.post('http://ec2-13-239-60-161.ap-southeast-2.compute.amazonaws.com:3001/api/logout', "",
+        {
+            headers: {'Authorization': `Bearer ${token}`}
+        }
+        ).then(function (response) {
                 const status = response.data.msg;
                 if (status === "success"){
                     localStorage.removeItem("token")
@@ -66,12 +74,12 @@ const Dashboard = ({ children }: any) => {
 
     const userDropDownMenu = (
         <Menu>
-            <Menu.Item>
+            <Menu.Item key="profile">
                 <a target="_blank" rel="noopener noreferrer" href="">
                     Profile(not implemented)
                 </a>
             </Menu.Item>
-            <Menu.Item>
+            <Menu.Item key="logout">
                 <a target="_blank" rel="noopener noreferrer" onClick={logout}>
                     Logout
                 </a>
@@ -86,29 +94,20 @@ const Dashboard = ({ children }: any) => {
                     <div className="logo">
                         <h3 style={{ fontFamily: "Bebas Neue", color: "#FFFFFF", position: "absolute", marginTop: "1px" }}>cms</h3>
                     </div>
-
-
                     <div style={{ paddingLeft: "100px", color: "#FFFFFF" }}>
-
                         {
                             isCollapsed ? <Button ghost style={{ borderColor: "black" }} icon={<MenuUnfoldOutlined />} onClick={e => setIsCollased(false)} /> : <Button ghost style={{ borderColor: "black" }} icon={<MenuFoldOutlined />} onClick={e => setIsCollased(true)} />
                         }
                     </div>
-
                     <div style={{ position: "absolute", top: 0, right: "30px" }}>
                         <Tooltip title="Notification">
 
                             <Button ghost style={{ borderColor: "black", left: "-15px" }} size="large" icon={<BellOutlined />} />
-
-
                         </Tooltip>
 
                         <Dropdown overlay={userDropDownMenu} arrow>
                             <Button shape="circle" icon={<UserOutlined />} />
                         </Dropdown>
-
-
-
                     </div>
 
                 </Header>
@@ -118,20 +117,19 @@ const Dashboard = ({ children }: any) => {
                             overflow: 'auto',
                             minHeight: '100vh',
                             left: 0,
-
                         }}
                         collapsible collapsed={isCollapsed} onCollapse={e => setIsCollased(e)}
                     >
                         <div className="logo" />
                         <Menu theme="dark" mode="inline">
                             <Menu.Item key="1" icon={<DashboardOutlined />}>
-                                <Link href="OverviewPage">
+                                <Link href="overview">
                                     Overview
                                 </Link>
                             </Menu.Item>
                             <SubMenu key="sub1" icon={<AuditOutlined />} title="Student">
                                 <Menu.Item key="2" icon={< TeamOutlined />}>
-                                    <Link href="StudentListPage">
+                                    <Link href="student/studentlist">
                                         Student List
                                     </Link>
                                 </Menu.Item>
@@ -179,14 +177,9 @@ const Dashboard = ({ children }: any) => {
                     </Content>
                 </Layout>
 
-
                 <Footer></Footer>
 
             </Layout>
-
-
-
-
         </>
     )
 }

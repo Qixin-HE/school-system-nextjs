@@ -6,6 +6,19 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useRouter } from 'next/router'
 
+type Role = "manager" | "student" | "teacher";
+interface LoginObject {
+  email: string,
+  password: string,
+  role: Role
+}
+
+interface LoginResponse {
+  role: Role,
+  token: string,
+  userId: number
+}
+
 export default function SignInPage() {
   const validateMessages = {
     required: '${label} is required!',
@@ -21,30 +34,27 @@ export default function SignInPage() {
   const router = useRouter();
 
   const onFormSubmit = (values: any) => {
-    const loginObject = {
+    const loginObject: LoginObject = {
       email: values.username,
       password: AES.encrypt(values.password, 'cms').toString(),
       role: role
     }
-    console.log(loginObject)
+    //console.log(loginObject)
     axios.post('http://ec2-13-239-60-161.ap-southeast-2.compute.amazonaws.com:3001/api/login', loginObject)
     .then(function (response) {
-      //console.log(response.data.token);
-      var res = response.data;
-      localStorage.setItem('token', res.data.token);
-      alert("Sign in successfully, token:" + res.data.token);
-      router.push("/OverviewPage")
+      
+      var res : LoginResponse  = response.data.data;
+      console.log(res)
+      localStorage.setItem('token', res.token);
+      //alert("Sign in successfully, token:" + res.data.token);
+      router.push("overview")
     })
     .catch(function (error) {
       console.log(error);
     });
   };
 
-  const [role, setRole] = useState("manager");
-
-  
-
-
+  const [role, setRole] = useState<Role>("manager");
 
   return (
     <>
@@ -124,8 +134,6 @@ export default function SignInPage() {
         </Col>
         <Col span={6}></Col>
       </Row>
-
-
 
     </>
   )

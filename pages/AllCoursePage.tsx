@@ -1,4 +1,4 @@
-import Dashboard from "./Dashboard";
+import Dashboard from "../components/Dashboard";
 import Link from 'next/link'
 
 const AllCoursePage = () => {
