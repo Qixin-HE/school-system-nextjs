@@ -1,54 +1,12 @@
 import Dashboard from "../../components/Dashboard";
 import { Space, Breadcrumb, Table } from 'antd';
-import axios from 'axios';
+import { AxiosResponse } from 'axios';
 import Link from 'next/link'
 import { useEffect, useState } from 'react';
+import { getService } from '../../api/service';
+import { getStudentResponse, Student, StudentListRecord } from "../../model/student";
 
 
-type StudentTypeName = "tester" | "developer";
-
-interface StudentType {
-    id: number,
-    name: StudentTypeName
-}
-interface Course {
-    id: number,
-    courseId: number,
-    name: string, 
-}
-interface Student {
-    createdAt: string,
-    updatedAt: string,
-    id: number,
-    email: string,
-    name: string,
-    country: string,
-    profileId: number,
-    type: StudentType,
-    courses: Course[],
-
-
-}
-interface getStudentResponse {
-    total: number,
-    students: Student[],
-    paginator: ResponsePaginator
-}
-
-interface ResponsePaginator {
-    page: number,
-    limit: number
-}
-
-interface StudentListRecord {
-    id: number,
-    name: string,
-    area: string,
-    email: string,
-    selectedCurriculum: string,
-    studentType: string,
-    joinTime: string | undefined
-}
 
 const StudentListPage = () => {
     
@@ -56,12 +14,8 @@ const StudentListPage = () => {
     var rows: any = [];
     useEffect(() => {
         var value:getStudentResponse;
-        const token = localStorage.getItem("token");
-        console.log("token", token);
-        //Axios.get<any, AxiosResponse<any, any>, any> 这个<>之间的是什么？
-        axios.get('http://ec2-13-239-60-161.ap-southeast-2.compute.amazonaws.com:3001/api/students?page=1&limit=20', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        }).then(function (response) {           
+        
+        getService("students?page=1&limit=20").then(function (response : AxiosResponse) {           
             value = response.data.data;
             //console.log(value)
 

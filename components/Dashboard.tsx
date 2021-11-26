@@ -16,23 +16,11 @@ import {
 import { useState, useEffect } from 'react';
 import Link from 'next/link'
 import React, { ReactNode } from 'react';
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, {  AxiosResponse } from 'axios';
 import { useRouter } from 'next/router'
-import { url } from 'inspector';
-
-// enum axiosMethod {
-// post =  "post",
-// get = "get"
-// }
+import { postService } from '../api/service';
 
 
-
-// interface axiosConfig {
-//     method: axiosMethod,
-//     url: String,
-//     headers: object
-//     data?: String
-// }
 
 
 const Dashboard = ({ children }: any) => {
@@ -48,16 +36,10 @@ const Dashboard = ({ children }: any) => {
 
 
 
-
-
     const logout = () => {
         console.log("Loging out")
 
-        axios.post('http://ec2-13-239-60-161.ap-southeast-2.compute.amazonaws.com:3001/api/logout', "",
-        {
-            headers: {'Authorization': `Bearer ${token}`}
-        }
-        ).then(function (response) {
+        postService("logout").then(function (response : AxiosResponse) {
                 const status = response.data.msg;
                 if (status === "success"){
                     localStorage.removeItem("token")
@@ -137,7 +119,7 @@ const Dashboard = ({ children }: any) => {
 
                             <SubMenu key="sub2" icon={<UserOutlined />} title="Teacher">
                                 <Menu.Item key="4" icon={< TeamOutlined />}>
-                                    <Link href="TeacherListPage">
+                                    <Link href="/teacherlist">
                                         Teacher List
                                     </Link>
                                 </Menu.Item>
