@@ -1,6 +1,7 @@
 import { ResponsePaginator } from "./response";
 
 export interface StudentListRecord {
+    key:number,
     id: number,
     name: string,
     area: string,
@@ -30,7 +31,6 @@ export interface Student {
     profileId: number,
     type: StudentType,
     courses: Course[],
-
 
 }
 export interface getStudentResponse {

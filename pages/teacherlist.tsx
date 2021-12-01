@@ -1,49 +1,48 @@
-import Dashboard from "../components/Dashboard";
+import Dashboard from "../lib/components/Dashboard";
 import Link from 'next/link';
-import { getService } from "../api/service";
+import { getService } from "../lib/api/baseService";
 import { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
-import { Space, Breadcrumb, Table } from 'antd';
-import { ResponsePaginator } from '../model/response';
-import { TeacherResponse, Teacher, TeacherListRecord } from '../model/teacher';
+import { Space, Breadcrumb, Table, TablePaginationConfig } from 'antd';
+import { ResponsePaginator } from '../lib/model/response';
+import { TeacherResponse, Teacher, TeacherListRecord } from '../lib/model/teacher';
+import { getTeacherListService } from "../lib/api/service";
 
 
 
 const TeacherListPage = () => {
-
-
-    const [data, setData] = useState();
+    const [data, setData] = useState<TeacherListRecord[]>([]);
+    //var total:number;
+    const [total, setTotal] =  useState<number>();
+    const [page, setPage] =  useState<number>();
+    const [limit, setLimit] =  useState<number>();
+    
     useEffect(() => {
-        var value: TeacherResponse; 
-        getService("teachers?page=1&limit=20").then(function (response: AxiosResponse) {
-            value = response.data.data;
-            //console.log(value)
-            //setData(value);
+        const rows = getTeacherListService(page, limit);
+        rows.then(function(result) {
+            setData(result.data);
+            setTotal(result.total);
+            //console.log("total is" + total)
+            console.log(data);
+        });          
+        
 
-        }).catch(function (error) {
-            
-            console.log(error);
-        }).then(function () {
-            var rows : any = [];
-            const json: Teacher[] = value.teachers;
-            json.forEach(e => {
-                const obj : TeacherListRecord = {
-                    id: e.id,
-                    name: e.name,
-                    country: e.country,
-                    email: e.email,
-                    skill: e.skills.map(item => item.name).join(","),
-                    courseAmount: e.courseAmount,
-                    phone: e.phone
-                }
-                console.log(obj)
-                rows.push(obj);
-            })
-            setData(rows);
-        })
-    }, []);
+    }, [page,limit]);
 
-    const { Column, ColumnGroup } = Table;
+    const { Column } = Table;
+    const pagination = {
+        current: page,
+        pageSize: limit,
+        total: total
+      }
+      const handleTableChange = (pagination: TablePaginationConfig) => {
+        setPage(pagination.current);
+        setLimit(pagination.pageSize);
+        
+      };
+
+
+   
 
     return (
         <>
@@ -53,7 +52,7 @@ const TeacherListPage = () => {
                     <Breadcrumb.Item>Teacher</Breadcrumb.Item>
                     <Breadcrumb.Item>Teacher List</Breadcrumb.Item>
                 </Breadcrumb>
-                <Table dataSource={data} >
+                <Table dataSource={data} pagination={pagination} onChange={handleTableChange}>
                     <Column title="No." dataIndex="id" key="id" />
                     <Column title="Name" dataIndex="name" key="name" />
                     <Column title="Country" dataIndex="country" key="country" />

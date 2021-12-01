@@ -1,70 +1,42 @@
-import Dashboard from "../../components/Dashboard";
-import { Space, Breadcrumb, Table } from 'antd';
-import { AxiosResponse } from 'axios';
-import Link from 'next/link'
+import Dashboard from "../../lib/components/Dashboard";
+import { Space, Breadcrumb, Table, TablePaginationConfig } from 'antd';
+import { StudentListRecord } from "../../lib/model/student";
 import { useEffect, useState } from 'react';
-import { getService } from '../../api/service';
-import { getStudentResponse, Student, StudentListRecord } from "../../model/student";
+import { getStudentListService } from '../../lib/api/service';
 
 
 
 const StudentListPage = () => {
     
-    const [data, setData] = useState();
-    var rows: any = [];
+    const [data, setData] = useState<StudentListRecord[]>([]);
+    //var total:number;
+    const [total, setTotal] =  useState<number>();
+    const [page, setPage] =  useState<number>();
+    const [limit, setLimit] =  useState<number>();
+    
     useEffect(() => {
-        var value:getStudentResponse;
+        const rows = getStudentListService(page, limit);
+        rows.then(function(result) {
+            setData(result.data);
+            setTotal(result.total);
+            //console.log("total is" + total)
+            console.log(data);
+        });          
         
-        getService("students?page=1&limit=20").then(function (response : AxiosResponse) {           
-            value = response.data.data;
-            //console.log(value)
 
-        }).catch(function (error) {
-            // handle error
-            console.log(error);
-        }).then(function () {
+    }, [page,limit]);
 
-            const json: Student[] = value.students;
-
-            const calculateJoinTime = (joinTime: string):string => {
-                const now = new Date();
-                const then = new Date(joinTime);
-                var Difference_In_Time: number = now.getTime() - then.getTime();
-
-                // To calculate the no. of days between two dates
-                var years : number = Difference_In_Time / (1000 * 3600 * 24 * 30 * 12);
-
-                const almostYear: number = parseInt(years.toString()) + 1;
-
-                if (parseInt((years % 1).toFixed(2).substring(2)) >= 50) {
-                    return "Almost " + almostYear + " years ago"
-                } else if (parseInt((years % 1).toFixed(2).substring(2)) < 50) {
-                    return "Over " + parseInt(years.toString()) + " years ago"
-                }
-                return "No record."
-            }
-
-            json.forEach(e => {
-                const obj:StudentListRecord = {
-                    id: e.id,
-                    name: e.name,
-                    area: e.country,
-                    email: e.email,
-                    selectedCurriculum: e.courses.map(item => item.name).join(","),
-                    studentType: e.type.name,
-                    joinTime: calculateJoinTime(e.createdAt)
-                }
-                rows.push(obj);
-
-            })
-            setData(rows);
-            //console.log("rows", data)
-        });
-
-    }, []);
-
-    const { Column, ColumnGroup } = Table;
-
+    const { Column } = Table;
+    const pagination = {
+        current: page,
+        pageSize: limit,
+        total: total
+      }
+      const handleTableChange = (pagination: TablePaginationConfig) => {
+        setPage(pagination.current);
+        setLimit(pagination.pageSize);
+        
+      };
     return (
         <>
             <Dashboard>
@@ -73,7 +45,7 @@ const StudentListPage = () => {
                     <Breadcrumb.Item>Student</Breadcrumb.Item>
                     <Breadcrumb.Item>Student List</Breadcrumb.Item>
                 </Breadcrumb>
-                <Table dataSource={data} >
+                <Table dataSource={data} pagination={pagination} onChange={handleTableChange} >
                     <Column title="No." dataIndex="id" key="id" />
                     <Column title="Name" dataIndex="name" key="name" />
                     <Column title="Area" dataIndex="area" key="area" />

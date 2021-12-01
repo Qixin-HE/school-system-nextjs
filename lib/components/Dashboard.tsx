@@ -15,10 +15,10 @@ import {
 } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import Link from 'next/link'
-import React, { ReactNode } from 'react';
-import axios, {  AxiosResponse } from 'axios';
+import React from 'react';
+import { logOutService } from '../api/service';
 import { useRouter } from 'next/router'
-import { postService } from '../api/service';
+
 
 
 
@@ -27,31 +27,21 @@ const Dashboard = ({ children }: any) => {
     const [isCollapsed, setIsCollased] = useState<boolean>(false);
     const { Header, Content, Footer, Sider } = Layout;
     const { SubMenu } = Menu;
-    //React['useEffectLayout'] = React.useEffect;
-    var token:String | null;
+
+    var token: String | null;
     if (typeof window !== 'undefined') {
         token = localStorage.getItem("token");
     }
     const router = useRouter();
 
-
-
-    const logout = () => {
-        console.log("Loging out")
-
-        postService("logout").then(function (response : AxiosResponse) {
-                const status = response.data.msg;
-                if (status === "success"){
-                    localStorage.removeItem("token")
-                    alert(`You have ${status}fully logout.`)
-                    
-                    router.push("/")
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-    };
+    const logoutfunction = () => {
+        try {
+            logOutService(); //如果它不成功，则不router.push,怎么写？
+            router.push("/")
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
 
     const userDropDownMenu = (
@@ -62,13 +52,14 @@ const Dashboard = ({ children }: any) => {
                 </a>
             </Menu.Item>
             <Menu.Item key="logout">
-                <a target="_blank" rel="noopener noreferrer" onClick={logout}>
+                <a target="_blank" rel="noopener noreferrer" onClick={logoutfunction}>
                     Logout
                 </a>
             </Menu.Item>
 
         </Menu>
     );
+
     return (
         <>
             <Layout>
@@ -105,13 +96,13 @@ const Dashboard = ({ children }: any) => {
                         <div className="logo" />
                         <Menu theme="dark" mode="inline">
                             <Menu.Item key="1" icon={<DashboardOutlined />}>
-                                <Link href="overview">
+                                <Link href="/overview">
                                     Overview
                                 </Link>
                             </Menu.Item>
                             <SubMenu key="sub1" icon={<AuditOutlined />} title="Student">
                                 <Menu.Item key="2" icon={< TeamOutlined />}>
-                                    <Link href="student/studentlist">
+                                    <Link href="/student/studentlist">
                                         Student List
                                     </Link>
                                 </Menu.Item>
@@ -127,17 +118,17 @@ const Dashboard = ({ children }: any) => {
                             </SubMenu>
                             <SubMenu key="sub3" icon={<ReadOutlined />} title="Course">
                                 <Menu.Item key="5" icon={<ProjectOutlined />}>
-                                    <Link href="AllCoursePage">
+                                    <Link href="/AllCoursePage">
                                         All Course
                                     </Link>
                                 </Menu.Item>
                                 <Menu.Item key="6" icon={<PlusSquareOutlined />}>
-                                    <Link href="AddCoursePage">
+                                    <Link href="/AddCoursePage">
                                         Add Course
                                     </Link>
                                 </Menu.Item>
                                 <Menu.Item key="7" icon={<EditOutlined />}>
-                                    <Link href="EditCoursePage">
+                                    <Link href="/EditCoursePage">
                                         Edit Course
                                     </Link>
                                 </Menu.Item>
@@ -145,7 +136,7 @@ const Dashboard = ({ children }: any) => {
 
                             <Menu.Item key="9" icon={<MessageOutlined />}>
 
-                                <Link href="MessagePage">
+                                <Link href="/MessagePage">
                                     Message
                                 </Link>
                             </Menu.Item>
