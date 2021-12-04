@@ -1,8 +1,8 @@
 import { getService, postService } from './baseService';
-import { getStudentResponse, Student, StudentListRecord } from "../model/student";
+import { getStudentResponse, Student, StudentListRecord, postStudent } from "../model/student";
 import { TeacherListRecord, TeacherResponse, Teacher } from "../model/teacher";
 import { AxiosResponse } from 'axios';
-import { useRouter } from 'next/router'
+
 
 export const getStudentListService = async (page?: number, limit?: number): Promise<any> => {
     var rows: StudentListRecord[] = [];
@@ -21,15 +21,15 @@ export const getStudentListService = async (page?: number, limit?: number): Prom
         console.log(error);
     }).then(function () {
 
-        const json: Student[] = value.students;
+        const studentRecords: Student[] = value.students;
 
         const calculateJoinTime = (joinTime: string): string => {
             const now = new Date();
             const then = new Date(joinTime);
-            var Difference_In_Time: number = now.getTime() - then.getTime();
+            const Difference_In_Time: number = now.getTime() - then.getTime();
 
             // To calculate the no. of days between two dates
-            var years: number = Difference_In_Time / (1000 * 3600 * 24 * 30 * 12);
+            const years: number = Difference_In_Time / (1000 * 3600 * 24 * 30 * 12);
 
             const almostYear: number = parseInt(years.toString()) + 1;
 
@@ -41,8 +41,8 @@ export const getStudentListService = async (page?: number, limit?: number): Prom
             return "No record."
         }
 
-        json.forEach(e => {
-            const obj: StudentListRecord = {
+        studentRecords.forEach(e => {
+            const studentItem: StudentListRecord = {
                 key: e.id,
                 id: e.id,
                 name: e.name,
@@ -52,7 +52,7 @@ export const getStudentListService = async (page?: number, limit?: number): Prom
                 studentType: e.type != null ? e.type.name : "null",
                 joinTime: calculateJoinTime(e.createdAt)
             }
-            rows.push(obj);
+            rows.push(studentItem);
 
         })
         return { data: rows, total: value.total };
@@ -67,7 +67,7 @@ export const logOutService = async (): Promise<any> => {
         const status = response.data.msg;
         if (status === "success") {
             localStorage.removeItem("token")
-            alert(`You have ${status}fully logout.`)
+            //alert(`You have ${status}fully logout.`)
             //router.push("/")
         }
         return true;
@@ -88,15 +88,15 @@ export const getTeacherListService = async (page?: number, limit?: number): Prom
     return await getService(`teachers?page=${page}&limit=${limit}`).then(function (response: AxiosResponse) {
         value = response.data.data;
         //console.log(value)
-        
+
 
     }).catch(function (error) {
         console.log(error);
     }).then(function () {
         var rows: any = [];
-        const json: Teacher[] = value.teachers;
-        json.forEach(e => {
-            const obj: TeacherListRecord = {
+        const teacherRecords: Teacher[] = value.teachers;
+        teacherRecords.forEach(e => {
+            const teacherItem: TeacherListRecord = {
                 id: e.id,
                 name: e.name,
                 country: e.country,
@@ -105,10 +105,26 @@ export const getTeacherListService = async (page?: number, limit?: number): Prom
                 courseAmount: e.courseAmount,
                 phone: e.phone
             }
-            console.log(obj)
-            rows.push(obj);
+            //console.log(teacherItem)
+            rows.push(teacherItem);
         })
         return { data: rows, total: value.total }
     }
     )
+};
+
+export const postStudentService = async (data: postStudent): Promise<any> => {
+
+
+    return await postService("students", data).then(function (response: AxiosResponse) {
+        const status = response.data;
+
+
+        console.log(`Status:  ${JSON.stringify(status)}`)
+
+        return true;
+    })
+        .catch(function (error) {
+            console.log(error);
+        });
 };

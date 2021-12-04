@@ -38,3 +38,10 @@ export interface getStudentResponse {
     students: Student[],
     paginator: ResponsePaginator
 }
+
+export interface postStudent {
+    name:string,
+    country: string,
+    email: string,
+    type: number
+}

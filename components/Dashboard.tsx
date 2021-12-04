@@ -16,7 +16,7 @@ import {
 import { useState, useEffect } from 'react';
 import Link from 'next/link'
 import React from 'react';
-import { logOutService } from '../api/service';
+import { logOutService } from '../lib/api/service';
 import { useRouter } from 'next/router'
 
 

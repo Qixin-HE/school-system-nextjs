@@ -1,16 +1,21 @@
 import axios, { AxiosResponse } from 'axios';
+import { url } from './configuration';
 
 
 export const getService = (path: string): Promise<AxiosResponse> => {
     const token = localStorage.getItem("token");
-    return axios.get(`http://ec2-13-239-60-161.ap-southeast-2.compute.amazonaws.com:3001/api/${path}`, {
+    //console.log(`${url}${path}`)
+    return axios.get(`${url}${path}`, {
         headers: { 'Authorization': `Bearer ${token}` }
     })
 }
 
-export const postService = (path: string): Promise<AxiosResponse> => {
+export const postService = (path: string, data?: any): Promise<AxiosResponse> => {
     const token = localStorage.getItem("token");
-    return axios.post(`http://ec2-13-239-60-161.ap-southeast-2.compute.amazonaws.com:3001/api/${path}`, "", {
+    if (data == undefined) {
+        data = "";
+    }
+    return axios.post(`${url}${path}`, data, {
         headers: { 'Authorization': `Bearer ${token}` }
     })
 }
