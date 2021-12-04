@@ -9,7 +9,7 @@ export const getStudentListService = async (page?: number, limit?: number): Prom
     var value: getStudentResponse;
     if (page == undefined || limit == undefined) {
         page = 1;
-        limit = 20;
+        limit = 10;
     }
 
     return await getService(`students?page=${page}&limit=${limit}`).then(function (response: AxiosResponse) {
