@@ -5,7 +5,7 @@ import {
 } from 'antd';
 import { StudentListRecord } from "../../lib/model/student";
 import { useEffect, useState } from 'react';
-import { getStudentListService, postAddStudentService, postDeleteStudentService } from '../../lib/api/service';
+import { getStudentListService, postAddStudentService, postDeleteStudentService, putEditStudentService } from '../../lib/api/service';
 
 
 
@@ -155,6 +155,11 @@ const StudentListPage = () => {
         });
     }
 
+    //const updateAStudent 
+    const handleUpdate = () =>{
+        
+    }
+
 
     return (
         <>
@@ -167,10 +172,10 @@ const StudentListPage = () => {
                 <Button key="add" type="primary" onClick={showModal} style={{ marginBottom: "10px" }}>
                     Add
                 </Button>
-                <Modal title="Add Student" mask={false} visible={isModalVisible} onOk={handleOk}
+                <Modal title="Edit Student" mask={false} visible={isModalVisible} onOk={handleOk}
                     onCancel={handleCancel} footer={[
-                        <Button key="add" type="primary" onClick={handleOk}>
-                            Add
+                        <Button key="add" type="primary" onClick={handleUpdate}>
+                            Update
                         </Button>,
                         <Button key="cancel" onClick={handleCancel}>
                             Cancel
