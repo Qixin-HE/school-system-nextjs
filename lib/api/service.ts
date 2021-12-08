@@ -1,4 +1,4 @@
-import { getService, postService } from './baseService';
+import { getService, postService, deleteService, putService } from './baseService';
 import { getStudentResponse, Student, StudentListRecord, postStudent } from "../model/student";
 import { TeacherListRecord, TeacherResponse, Teacher } from "../model/teacher";
 import { AxiosResponse } from 'axios';
@@ -113,7 +113,7 @@ export const getTeacherListService = async (page?: number, limit?: number): Prom
     )
 };
 
-export const postStudentService = async (data: postStudent): Promise<any> => {
+export const postAddStudentService = async (data: postStudent): Promise<any> => {
 
 
     return await postService("students", data).then(function (response: AxiosResponse) {
@@ -121,8 +121,53 @@ export const postStudentService = async (data: postStudent): Promise<any> => {
 
 
         console.log(`Status:  ${JSON.stringify(status)}`)
+        if (status.msg == "success"){
+        return {status: true,
+        id: status.data.profileId}; }else {
+            return {status: false};
+        }
 
-        return true;
+    })
+        .catch(function (error) {
+            console.log(error);
+        });
+};
+
+export const postDeleteStudentService= async (id: string): Promise<any> => {
+
+
+    return await deleteService(`students/${id}`).then(function (response: AxiosResponse) {
+        const status = response.data;
+
+
+        //console.log(`Status:  ${JSON.stringify(status)}`)
+        if (status.msg == "success"){
+        return true
+         }else {
+            return false;
+        }
+
+    })
+        .catch(function (error) {
+            console.log(error);
+        });
+};
+
+
+export const putEditStudentService = async (data: postStudent): Promise<any> => {
+
+
+    return await putService("students", data).then(function (response: AxiosResponse) {
+        const status = response.data;
+
+
+        // console.log(`Status:  ${JSON.stringify(status)}`)
+        // if (status.msg == "success"){
+        // return {status: true,
+        // id: status.data.profileId}; }else {
+        //     return {status: false};
+        // }
+
     })
         .catch(function (error) {
             console.log(error);

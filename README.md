@@ -1,4 +1,9 @@
-问题:
+问题：
+1.在student list page里面， 刚进去点击最后一页，然后add student（直接点fill student），然后添加，总是不能添加成功，两处console.log 都会显示四个值undefined，这是为什么呢？怎么处理呢？
+2.用shouldUpdate做一个number的useState,每次添加一个学生就setShouldUpdate + 1使得useEffect再次trigger来刷新页面 是一个好的做法吗？
+
+//
+已解决问题：
 1.在studentlist的页面的问题，如果logout不成功则不router.push应该怎么写呢？
 2.我的文件夹标红，写着“Contains emphasized items",怎么解决呢？
 

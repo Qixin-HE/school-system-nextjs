@@ -19,3 +19,21 @@ export const postService = (path: string, data?: any): Promise<AxiosResponse> =>
         headers: { 'Authorization': `Bearer ${token}` }
     })
 }
+
+export const putService = (path: string, data?: any): Promise<AxiosResponse> => {
+    const token = localStorage.getItem("token");
+    if (data == undefined) {
+        data = "";
+    }
+    return axios.put(`${url}${path}`, data, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    })
+}
+
+export const deleteService = (path: string): Promise<AxiosResponse> => {
+    const token = localStorage.getItem("token");
+    
+    return axios.delete(`${url}${path}`,  {
+        headers: { 'Authorization': `Bearer ${token}` }
+    })
+}

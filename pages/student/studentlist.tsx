@@ -1,11 +1,11 @@
 import Dashboard from "../../components/Dashboard";
 import {
     Space, Breadcrumb, Table, TablePaginationConfig, Modal,
-    Form, Select, Input, Button
+    Form, Select, Input, Button, message, Popconfirm
 } from 'antd';
 import { StudentListRecord } from "../../lib/model/student";
 import { useEffect, useState } from 'react';
-import { getStudentListService, postStudentService } from '../../lib/api/service';
+import { getStudentListService, postAddStudentService, postDeleteStudentService } from '../../lib/api/service';
 
 
 
@@ -16,7 +16,7 @@ const StudentListPage = () => {
     const [total, setTotal] = useState<number>();
     const [page, setPage] = useState<number>();
     const [limit, setLimit] = useState<number>();
-    const [shouldUpdate, setShouldUpdate] = useState<boolean>(false);
+    const [shouldUpdate, setShouldUpdate] = useState<number>(0);
 
     useEffect(() => {
         const rows = getStudentListService(page, limit);
@@ -24,7 +24,7 @@ const StudentListPage = () => {
             setData(result.data);
             setTotal(result.total);
             //console.log("total is" + total)
-            console.log(data);
+            //console.log(data);
         });
 
 
@@ -48,36 +48,64 @@ const StudentListPage = () => {
     const showModal = () => {
         setIsModalVisible(true);
     };
+    const [name, setName] = useState<string>();
+    const [email, setEmail] = useState<string>();
+    const [area, setArea] = useState<string>();
+    const [studentType, setStudentType] = useState<string>();
 
     const handleOk = () => {
         //setIsModalVisible(false);
+        console.log("first");
+        console.log(name, email, area, studentType);
         name == undefined ? setName(form.getFieldValue("name")) : null;
         email == undefined ? setEmail(form.getFieldValue("email")) : null;
         area == undefined ? setArea(form.getFieldValue("area")) : null;
         studentType == undefined ? setStudentType(form.getFieldValue("studenttype")) : null;
-
+        console.log("second");
+        console.log(name, email, area, studentType);
         if (name != undefined && email != undefined && area != undefined && studentType != undefined) {
-            postStudentService(
+            const postResult = postAddStudentService(
                 {
                     name: name,
                     email: email,
                     country: area,
                     type: studentType == "tester" ? 1 : 0,
+                }).then(function (response) {
+
+                    if (response.status == true) {
+                        message.success(`Student ${name} with id ${response.id} has been added successfully!`);
+                        setShouldUpdate(shouldUpdate + 1);
+                    } else {
+                        message.error('Something went wrong. Try again~');
+                    }
+
                 });
 
         } else {
+            message.error('Something went wrong. Try again!');
             console.log("here comes else" +
                 JSON.stringify({
                     name: name,
                     email: email,
                     country: area,
-                    type: studentType == "tester" ? 1 : 0,
+                    type: studentType,
                 }))
         }
-        setShouldUpdate(true);
+
+
+
         setIsModalVisible(false);
 
     };
+
+    //for notification
+    // const openNotificationWithIcon = (type) => {
+    //     notification[type]({
+    //       message: 'Notification Title',
+    //       description:
+    //         'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+    //     });
+    //   };
 
     const handleCancel = () => {
         setIsModalVisible(false);
@@ -103,17 +131,7 @@ const StudentListPage = () => {
     };
 
 
-    // const onFinish = () => {
-    //     console.log({
-    //         name: name,
-    //         email: email,
-    //         area: area,
-    //         studentType: studentType
-    //     });
-    // };
-
-
-
+    // for testing easier
     const onFill = () => {
         form.setFieldsValue({
             name: 'zoe',
@@ -123,10 +141,20 @@ const StudentListPage = () => {
         });
     };
 
-    const [name, setName] = useState<string>();
-    const [email, setEmail] = useState<string>();
-    const [area, setArea] = useState<string>();
-    const [studentType, setStudentType] = useState<string>();
+    // for delete a student
+    const deleteAStudent = (id:string) => {
+        postDeleteStudentService(id).then(function (response) {
+
+            if (response == true) {
+                message.success(`The student has been deleted successfully!`);
+                setShouldUpdate(shouldUpdate - 1);
+            } else {
+                message.error('Something went wrong. Try again~');
+            }
+
+        });
+    }
+
 
     return (
         <>
@@ -136,76 +164,76 @@ const StudentListPage = () => {
                     <Breadcrumb.Item>Student</Breadcrumb.Item>
                     <Breadcrumb.Item>Student List</Breadcrumb.Item>
                 </Breadcrumb>
-                <Button key="add" type="primary" onClick={showModal} style={{marginBottom: "10px"}}>
-                                            Add
-                                        </Button>
+                <Button key="add" type="primary" onClick={showModal} style={{ marginBottom: "10px" }}>
+                    Add
+                </Button>
                 <Modal title="Add Student" mask={false} visible={isModalVisible} onOk={handleOk}
-                                    onCancel={handleCancel} footer={[
-                                        <Button key="add" type="primary" onClick={handleOk}>
-                                            Add
-                                        </Button>,
-                                        <Button key="cancel" onClick={handleCancel}>
-                                            Cancel
-                                        </Button>,
+                    onCancel={handleCancel} footer={[
+                        <Button key="add" type="primary" onClick={handleOk}>
+                            Add
+                        </Button>,
+                        <Button key="cancel" onClick={handleCancel}>
+                            Cancel
+                        </Button>,
 
-                                    ]}>
-                                    <Form {...layout} form={form} name="control-hooks">
-                                        <Form.Item name="name" label="Name" rules={[{ required: true }]}>
-                                            <Input onChange={e => {
-                                                form.setFieldsValue({ name: e.target.value });
-                                                setName(e.target.value)
-                                            }} />
-                                        </Form.Item>
-                                        <Form.Item name="email" label="Email" rules={[{ type: 'email', required: true }]}>
-                                            <Input onChange={e => {
-                                                form.setFieldsValue({ email: e.target.value })
-                                                setEmail(e.target.value)
-                                            }} />
-                                        </Form.Item>
-                                        <Form.Item name="area" label="Area" rules={[{ required: true }]}>
-                                            <Select
-                                                placeholder="Select an option"
-                                                onChange={onAreaChange}
-                                                allowClear
-                                            >
-                                                <Option value="china">China</Option>
-                                                <Option value="zimbabwe">Zimbabwe</Option>
-                                                <Option value="lebanon">Lebanon</Option>
-                                                <Option value="other">Other</Option>
-                                            </Select>
-                                        </Form.Item>
-                                        <Form.Item
-                                            noStyle
-                                            shouldUpdate={(prevValues, currentValues) => prevValues.gender !== currentValues.gender}
-                                        >
-                                            {({ getFieldValue }) =>
-                                                getFieldValue('area') === 'other' ? (
-                                                    <Form.Item name="customizeArea" label="Customize Area" rules={[{ required: true }]}>
-                                                        <Input />
-                                                    </Form.Item>
-                                                ) : null
-                                            }
-                                        </Form.Item>
-                                        <Form.Item name="studenttype" label="Student Type" rules={[{ required: true }]}>
-                                            <Select
-                                                placeholder="Select an option."
-                                                onChange={onStudentTypeChange}
-                                                allowClear
-                                            >
-                                                <Option value="developer">Developer</Option>
-                                                <Option value="tester">Tester</Option>
+                    ]}>
+                    <Form {...layout} form={form} name="control-hooks">
+                        <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+                            <Input onChange={e => {
+                                form.setFieldsValue({ name: e.target.value });
+                                setName(e.target.value)
+                            }} />
+                        </Form.Item>
+                        <Form.Item name="email" label="Email" rules={[{ type: 'email', required: true }]}>
+                            <Input onChange={e => {
+                                form.setFieldsValue({ email: e.target.value })
+                                setEmail(e.target.value)
+                            }} />
+                        </Form.Item>
+                        <Form.Item name="area" label="Area" rules={[{ required: true }]}>
+                            <Select
+                                placeholder="Select an option"
+                                onChange={onAreaChange}
+                                allowClear
+                            >
+                                <Option value="china">China</Option>
+                                <Option value="zimbabwe">Zimbabwe</Option>
+                                <Option value="lebanon">Lebanon</Option>
+                                <Option value="other">Other</Option>
+                            </Select>
+                        </Form.Item>
+                        <Form.Item
+                            noStyle
+                            shouldUpdate={(prevValues, currentValues) => prevValues.gender !== currentValues.gender}
+                        >
+                            {({ getFieldValue }) =>
+                                getFieldValue('area') === 'other' ? (
+                                    <Form.Item name="customizeArea" label="Customize Area" rules={[{ required: true }]}>
+                                        <Input />
+                                    </Form.Item>
+                                ) : null
+                            }
+                        </Form.Item>
+                        <Form.Item name="studenttype" label="Student Type" rules={[{ required: true }]}>
+                            <Select
+                                placeholder="Select an option."
+                                onChange={onStudentTypeChange}
+                                allowClear
+                            >
+                                <Option value="developer">Developer</Option>
+                                <Option value="tester">Tester</Option>
 
-                                            </Select>
-                                        </Form.Item>
-                                        <Form.Item {...tailLayout}>
+                            </Select>
+                        </Form.Item>
+                        <Form.Item {...tailLayout}>
 
 
-                                            <Button type="link" htmlType="button" onClick={onFill}>
-                                                Fill form
-                                            </Button>
-                                        </Form.Item>
-                                    </Form>
-                                </Modal>
+                            <Button type="link" htmlType="button" onClick={onFill}>
+                                Fill form
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </Modal>
                 <Table dataSource={data} pagination={pagination} onChange={handleTableChange} >
                     <Column title="No." dataIndex="id" key="id" />
                     <Column title="Name" dataIndex="name" key="name" />
@@ -217,7 +245,7 @@ const StudentListPage = () => {
                     <Column
                         title="Action"
                         key="action"
-                        render={(text, record) => (
+                        render={(text, record: { key: React.Key }) => (
                             <Space size="middle">
                                 <a onClick={showModal}>Edit</a>
                                 <Modal title="Add Student" mask={false} visible={isModalVisible} onOk={handleOk}
@@ -287,7 +315,20 @@ const StudentListPage = () => {
                                         </Form.Item>
                                     </Form>
                                 </Modal>
-                                <a>Delete</a>
+
+                                {/* <Popover
+                                    content={<a onClick={() => setDeletePopoverVisible(false)}>Close</a>}
+                                    title="Title"
+                                    trigger="click"
+                                    visible={deletePopoverVisible}
+                                    onVisibleChange={visible => setDeletePopoverVisible(visible)}
+                                > */}
+                               {data.length >= 1 ? (
+                                <Popconfirm title="Sure to delete?" onConfirm={() =>{deleteAStudent(record.key.toString())}}>
+                                    <a>Delete</a>
+                                </Popconfirm>
+                                ) : null}
+                                {/* </Popover> */}
                             </Space>
                         )}
                     />
@@ -298,3 +339,4 @@ const StudentListPage = () => {
 }
 
 export default StudentListPage;
+
