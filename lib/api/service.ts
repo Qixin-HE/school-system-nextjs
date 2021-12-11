@@ -1,5 +1,5 @@
 import { getService, postService, deleteService, putService } from './baseService';
-import { getStudentResponse, Student, StudentListRecord, postStudent } from "../model/student";
+import { getStudentResponse, Student, StudentListRecord, postStudent, editPutStudent } from "../model/student";
 import { TeacherListRecord, TeacherResponse, Teacher } from "../model/teacher";
 import { AxiosResponse } from 'axios';
 
@@ -154,19 +154,14 @@ export const postDeleteStudentService= async (id: string): Promise<any> => {
 };
 
 
-export const putEditStudentService = async (data: postStudent): Promise<any> => {
+export const putEditStudentService = async (data: editPutStudent): Promise<any> => {
 
 
     return await putService("students", data).then(function (response: AxiosResponse) {
         const status = response.data;
 
 
-        // console.log(`Status:  ${JSON.stringify(status)}`)
-        // if (status.msg == "success"){
-        // return {status: true,
-        // id: status.data.profileId}; }else {
-        //     return {status: false};
-        // }
+        console.log(status)
 
     })
         .catch(function (error) {

@@ -6,6 +6,7 @@ import {
 import { StudentListRecord } from "../../lib/model/student";
 import { useEffect, useState } from 'react';
 import { getStudentListService, postAddStudentService, postDeleteStudentService, putEditStudentService } from '../../lib/api/service';
+import Item from "antd/lib/list/Item";
 
 
 
@@ -43,10 +44,16 @@ const StudentListPage = () => {
     };
 
     // for modal
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isAddStudentModalVisible, setIsAddStudentModalVisible] = useState(false);
+    const [isEditStudentModalVisible, setIsEditStudentModalVisible] = useState(false);
 
-    const showModal = () => {
-        setIsModalVisible(true);
+    const showAddStudentModal = () => {
+        setIsAddStudentModalVisible(true);
+    };
+    const showEditStudentModal = (key: string) => {
+        setRowKey(key)
+        setIsEditStudentModalVisible(true);
+
     };
     const [name, setName] = useState<string>();
     const [email, setEmail] = useState<string>();
@@ -57,10 +64,10 @@ const StudentListPage = () => {
         //setIsModalVisible(false);
         console.log("first");
         console.log(name, email, area, studentType);
-        name == undefined ? setName(form.getFieldValue("name")) : null;
-        email == undefined ? setEmail(form.getFieldValue("email")) : null;
-        area == undefined ? setArea(form.getFieldValue("area")) : null;
-        studentType == undefined ? setStudentType(form.getFieldValue("studenttype")) : null;
+        name == undefined ? setName(formAdd.getFieldValue("name")) : null;
+        email == undefined ? setEmail(formAdd.getFieldValue("email")) : null;
+        area == undefined ? setArea(formAdd.getFieldValue("area")) : null;
+        studentType == undefined ? setStudentType(formAdd.getFieldValue("studenttype")) : null;
         console.log("second");
         console.log(name, email, area, studentType);
         if (name != undefined && email != undefined && area != undefined && studentType != undefined) {
@@ -94,7 +101,7 @@ const StudentListPage = () => {
 
 
 
-        setIsModalVisible(false);
+        setIsAddStudentModalVisible(false);
 
     };
 
@@ -108,7 +115,7 @@ const StudentListPage = () => {
     //   };
 
     const handleCancel = () => {
-        setIsModalVisible(false);
+        setIsAddStudentModalVisible(false);
     };
 
     //for edit student form
@@ -121,7 +128,8 @@ const StudentListPage = () => {
     const tailLayout = {
         wrapperCol: { offset: 8, span: 16 },
     };
-    const [form] = Form.useForm();
+    const [formAdd] = Form.useForm();
+    const [formEdit] = Form.useForm();
 
     const onAreaChange = (value: string) => {
         setArea(value);
@@ -133,7 +141,7 @@ const StudentListPage = () => {
 
     // for testing easier
     const onFill = () => {
-        form.setFieldsValue({
+        formAdd.setFieldsValue({
             name: 'zoe',
             email: 'zoe@test.com',
             area: 'china',
@@ -142,7 +150,7 @@ const StudentListPage = () => {
     };
 
     // for delete a student
-    const deleteAStudent = (id:string) => {
+    const deleteAStudent = (id: string) => {
         postDeleteStudentService(id).then(function (response) {
 
             if (response == true) {
@@ -155,10 +163,41 @@ const StudentListPage = () => {
         });
     }
 
-    //const updateAStudent 
-    const handleUpdate = () =>{
-        
+
+    const handleUpdate = () => {
+
+        const formStudentValues = formEdit.getFieldsValue();
+
+        const editedStudent = {
+            "id": parseInt(rowKey),
+            "email": formStudentValues.email,
+            "name": formStudentValues.name,
+            "country": formStudentValues.area,
+            "type": formStudentValues.studenttype == "tester" ? 1 : 0,
+        }
+
+        putEditStudentService(editedStudent)
+
     }
+
+    const [rowKey, setRowKey] = useState<string>("");
+
+    const onEditStudentModalClose = () => {
+
+        setIsEditStudentModalVisible(false)
+    }
+    useEffect(() => {
+        const student = data.filter(student => student.id.toString() == rowKey)[0];
+        if (student != undefined) {
+            formEdit.setFieldsValue({
+                name: student.name,
+                email: student.email,
+                area: student.area,
+                studenttype: student.studentType
+            });
+        }
+    }, [rowKey]);
+
 
 
     return (
@@ -169,29 +208,29 @@ const StudentListPage = () => {
                     <Breadcrumb.Item>Student</Breadcrumb.Item>
                     <Breadcrumb.Item>Student List</Breadcrumb.Item>
                 </Breadcrumb>
-                <Button key="add" type="primary" onClick={showModal} style={{ marginBottom: "10px" }}>
+                <Button key="add" type="primary" onClick={showAddStudentModal} style={{ marginBottom: "10px" }}>
                     Add
                 </Button>
-                <Modal title="Edit Student" mask={false} visible={isModalVisible} onOk={handleOk}
+                <Modal key="addStudent" title="Add Student" mask={false} visible={isAddStudentModalVisible} onOk={handleOk}
                     onCancel={handleCancel} footer={[
                         <Button key="add" type="primary" onClick={handleUpdate}>
-                            Update
+                            Add
                         </Button>,
                         <Button key="cancel" onClick={handleCancel}>
                             Cancel
                         </Button>,
 
                     ]}>
-                    <Form {...layout} form={form} name="control-hooks">
+                    <Form {...layout} form={formAdd} name="control-hooks">
                         <Form.Item name="name" label="Name" rules={[{ required: true }]}>
                             <Input onChange={e => {
-                                form.setFieldsValue({ name: e.target.value });
+                                formAdd.setFieldsValue({ name: e.target.value });
                                 setName(e.target.value)
                             }} />
                         </Form.Item>
                         <Form.Item name="email" label="Email" rules={[{ type: 'email', required: true }]}>
                             <Input onChange={e => {
-                                form.setFieldsValue({ email: e.target.value })
+                                formAdd.setFieldsValue({ email: e.target.value })
                                 setEmail(e.target.value)
                             }} />
                         </Form.Item>
@@ -252,27 +291,31 @@ const StudentListPage = () => {
                         key="action"
                         render={(text, record: { key: React.Key }) => (
                             <Space size="middle">
-                                <a onClick={showModal}>Edit</a>
-                                <Modal title="Add Student" mask={false} visible={isModalVisible} onOk={handleOk}
-                                    onCancel={handleCancel} footer={[
-                                        <Button key="add" type="primary" onClick={handleOk}>
-                                            Add
+                                <a onClick={() => showEditStudentModal(record.key.toString())}>Edit</a>
+                                {/* 第二个modal */}
+                                <Modal title="Edit Student" mask={false} destroyOnClose
+                                    visible={isEditStudentModalVisible}
+                                    onCancel={onEditStudentModalClose} footer={[
+                                        <Button key="update" type="primary" onClick={handleUpdate}>
+                                            Update
                                         </Button>,
-                                        <Button key="cancel" onClick={handleCancel}>
+                                        <Button key="cancel" onClick={() => { setIsEditStudentModalVisible(false) }}>
                                             Cancel
                                         </Button>,
 
                                     ]}>
-                                    <Form {...layout} form={form} name="control-hooks">
+                                    <Form {...layout} form={formEdit} name="control-hooks" preserve={false}
+                                    >
+                                        {/* {() => <div> */}
                                         <Form.Item name="name" label="Name" rules={[{ required: true }]}>
                                             <Input onChange={e => {
-                                                form.setFieldsValue({ name: e.target.value });
+                                                formEdit.setFieldsValue({ name: e.target.value });
                                                 setName(e.target.value)
                                             }} />
                                         </Form.Item>
                                         <Form.Item name="email" label="Email" rules={[{ type: 'email', required: true }]}>
                                             <Input onChange={e => {
-                                                form.setFieldsValue({ email: e.target.value })
+                                                formEdit.setFieldsValue({ email: e.target.value })
                                                 setEmail(e.target.value)
                                             }} />
                                         </Form.Item>
@@ -281,11 +324,20 @@ const StudentListPage = () => {
                                                 placeholder="Select an option"
                                                 onChange={onAreaChange}
                                                 allowClear
+
                                             >
                                                 <Option value="china">China</Option>
                                                 <Option value="zimbabwe">Zimbabwe</Option>
                                                 <Option value="lebanon">Lebanon</Option>
                                                 <Option value="other">Other</Option>
+                                                {data.filter(student => student.id.toString() == rowKey)[0] != undefined &&
+                                                    data.filter(student => student.id.toString() == rowKey)[0].area !== "china" || "zimbabwe" || "lebanon" ? (
+                                                    <Option key="initialselectvalue" value={data.filter(student => student.id.toString() == rowKey)[0] != undefined ? data.filter(student => student.id.toString() == rowKey)[0].area : "null"}>
+                                                        {data.filter(student => student.id.toString() == rowKey)[0] != undefined ? data.filter(student => student.id.toString() == rowKey)[0].area : "null"}
+                                                    </Option>
+                                                ) : null
+                                                }
+
                                             </Select>
                                         </Form.Item>
                                         <Form.Item
@@ -305,35 +357,26 @@ const StudentListPage = () => {
                                                 placeholder="Select an option."
                                                 onChange={onStudentTypeChange}
                                                 allowClear
+
                                             >
                                                 <Option value="developer">Developer</Option>
                                                 <Option value="tester">Tester</Option>
 
                                             </Select>
                                         </Form.Item>
-                                        <Form.Item {...tailLayout}>
+                                        {/* </div>} */}
 
 
-                                            <Button type="link" htmlType="button" onClick={onFill}>
-                                                Fill form
-                                            </Button>
-                                        </Form.Item>
                                     </Form>
                                 </Modal>
 
-                                {/* <Popover
-                                    content={<a onClick={() => setDeletePopoverVisible(false)}>Close</a>}
-                                    title="Title"
-                                    trigger="click"
-                                    visible={deletePopoverVisible}
-                                    onVisibleChange={visible => setDeletePopoverVisible(visible)}
-                                > */}
-                               {data.length >= 1 ? (
-                                <Popconfirm title="Sure to delete?" onConfirm={() =>{deleteAStudent(record.key.toString())}}>
-                                    <a>Delete</a>
-                                </Popconfirm>
+
+                                {data.length >= 1 ? (
+                                    <Popconfirm title="Sure to delete?" onConfirm={() => { deleteAStudent(record.key.toString()) }}>
+                                        <a>Delete</a>
+                                    </Popconfirm>
                                 ) : null}
-                                {/* </Popover> */}
+
                             </Space>
                         )}
                     />

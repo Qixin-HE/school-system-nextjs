@@ -1,4 +1,12 @@
 问题：
+1.edit student 无法更改type（student type)
+//
+form control: edit student 
+try1: default value x (actually null in the form value field)
+try2: initialvalue x (too slow to get it set when rowKey changed)
+try3: useEffect ✅
+//
+已解决问题：
 1.在student list page里面， 刚进去点击最后一页，然后add student（直接点fill student），然后添加，总是不能添加成功，两处console.log 都会显示四个值undefined，这是为什么呢？怎么处理呢？
 2.用shouldUpdate做一个number的useState,每次添加一个学生就setShouldUpdate + 1使得useEffect再次trigger来刷新页面 是一个好的做法吗？
 

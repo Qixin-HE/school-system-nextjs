@@ -40,8 +40,12 @@ export interface getStudentResponse {
 }
 
 export interface postStudent {
+    
     name:string,
     country: string,
     email: string,
     type: number
+}
+export interface editPutStudent extends postStudent{
+    id: number
 }
