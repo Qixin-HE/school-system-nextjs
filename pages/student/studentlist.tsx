@@ -8,7 +8,10 @@ import { useEffect, useState } from 'react';
 import { getStudentListService, postAddStudentService, postDeleteStudentService, putEditStudentService } from '../../lib/api/service';
 import Item from "antd/lib/list/Item";
 
-
+interface ColomnFilter {
+    text: string,
+    value: string
+}
 
 const StudentListPage = () => {
 
@@ -76,7 +79,7 @@ const StudentListPage = () => {
                     name: name,
                     email: email,
                     country: area,
-                    type: studentType == "tester" ? 1 : 0,
+                    type: studentType == "tester" ? 1 : 2,
                 }).then(function (response) {
 
                     if (response.status == true) {
@@ -173,7 +176,7 @@ const StudentListPage = () => {
             "email": formStudentValues.email,
             "name": formStudentValues.name,
             "country": formStudentValues.area,
-            "type": formStudentValues.studenttype == "tester" ? 1 : 0,
+            "type": formStudentValues.studenttype == "tester" ? 1 : 2,
         }
 
         putEditStudentService(editedStudent)
@@ -198,7 +201,22 @@ const StudentListPage = () => {
         }
     }, [rowKey]);
 
+const createAreaFilter = () => {
+    const areas = new Set(data.map(student => student.area));
+    let filter:any[] = []
+    areas.forEach(area => {
+        const filterObject = {
+            text: area,
+            value: area.toLowerCase()
+        }
+        filter.push(filterObject)
+    })
+    return filter;
+}
 
+//for search bar
+const { Search } = Input;
+const onSearch = value => console.log(typeof value);
 
     return (
         <>
@@ -211,6 +229,7 @@ const StudentListPage = () => {
                 <Button key="add" type="primary" onClick={showAddStudentModal} style={{ marginBottom: "10px" }}>
                     Add
                 </Button>
+                <Search placeholder="enter a student name" onSearch={(value) => onSearch(value)} style={{ width: 500, position:"absolute",right:"2%" }} />
                 <Modal key="addStudent" title="Add Student" mask={false} visible={isAddStudentModalVisible} onOk={handleOk}
                     onCancel={handleCancel} footer={[
                         <Button key="add" type="primary" onClick={handleUpdate}>
@@ -279,9 +298,10 @@ const StudentListPage = () => {
                     </Form>
                 </Modal>
                 <Table dataSource={data} pagination={pagination} onChange={handleTableChange} >
-                    <Column title="No." dataIndex="id" key="id" />
-                    <Column title="Name" dataIndex="name" key="name" />
-                    <Column title="Area" dataIndex="area" key="area" />
+                    <Column title="No." dataIndex="id" key="id" sorter={(a : StudentListRecord, b:StudentListRecord ) => a.id - b.id } sortDirections= {['descend']}
+    />
+                    <Column title="Name" dataIndex="name" key="name" sorter={(a : StudentListRecord, b:StudentListRecord ) => a.name.length - b.name.length } sortDirections= {['descend']}/>
+                    <Column title="Area" dataIndex="area" key="area" filters={createAreaFilter()} onFilter={(value, record : StudentListRecord) => record.area.toLowerCase() === value}/>
                     <Column title="Email" dataIndex="email" key="email" />
                     <Column title="Selected Curriculum" dataIndex="selectedCurriculum" key="selectedCurriculum" />
                     <Column title="Student Type" dataIndex="studentType" key="studentType" />
