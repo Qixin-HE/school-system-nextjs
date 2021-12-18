@@ -12,16 +12,16 @@ const StudentDetailPage = () => {
 
   const { id } = router.query
 
-  const [data, setData] = useState();
+  const [data, setData] = useState("");
   const [total, setTotal] = useState<number>();
 
   //let text;
 
-  //useEffect(() => {
+  useEffect(() => {
   if (id !== undefined) {
     getAStudentByIDService(id.toString()).then(function (result) {
-      let contry = result.country;
-      setData(contry);
+      
+      setData(result);
       //setTotal(result.total);
       //console.log("total is" + total)
 
@@ -32,9 +32,12 @@ const StudentDetailPage = () => {
   }
 
 
-  //}, []);
+  }, []);
   const { Header, Footer, Sider, Content } = Layout;
 
+  // if (data == undefined) {
+  //   return (<p>loading</p>)
+  // }
 
   return (
     <>
@@ -49,14 +52,43 @@ const StudentDetailPage = () => {
           <div className="space-align-block" style={{ backgroundColor: "white" }}>
             <Row>
               <Col flex={2} style={{ padding: "20px" }}>
-                <Card title={<Avatar size={64} src={<Image  src={`/profile.jpg`} />} />} style={{ width: 300 }} headStyle={{textAlign:"center"}}>
-                  <p>Card content</p>
-                  <p>Card content</p>
-                  <p>Card content</p>
+                <Card title={<Avatar size={100} src={<Image src={`/profile.jpg`} />} />} style={{ textAlign: "center" }}>
+                  
+                    <Row type="flex" align="middle">
+                      
+                        <Col>
+                          
+                            <Row>
+                              <strong>Name</strong>
+            
+                            </Row>
+                            <Row><p>{data.name}</p></Row>
+                            <Row>
+                              <strong>Email</strong>
+                            </Row>
+                          
+                        </Col>
+                        <Col>
+                          
+                            <Row>
+                              <strong>Age</strong>
+                            </Row>
+                            <Row>
+                              <strong>Phone</strong>
+                            </Row>
+                         
+                        </Col>
+                      
+                    </Row>
+                    <strong>Address</strong>
+                    <Row>
+
+                    </Row>
+                  
                 </Card>
               </Col>
               <Col flex={3} style={{ padding: "20px" }}>
-                <Card title="Default size card" extra={<a href="#">More</a>} style={{ width: 300 }}>
+                <Card title="Default size card" extra={<a href="#">More</a>} >
                   <p>Card content</p>
                   <p>Card content</p>
                   <p>Card content</p>
@@ -64,7 +96,7 @@ const StudentDetailPage = () => {
               </Col>
             </Row>
           </div>
-          <p>{data}</p>
+          
         </Content>
 
       </Layout>
@@ -74,34 +106,3 @@ const StudentDetailPage = () => {
 }
 
 export default StudentDetailPage;
-// export async function getStaticProps({ params }) {
-//     const postData = await getPostData(params.id)
-//     return {
-//       props: {
-//         postData
-//       }
-//     }
-//   }
-// export async function getStaticPaths() {
-//   const paths = getAllPostIds()
-//   return {
-//     paths,
-//     fallback: false
-//   }
-// }
-// export default function Post({ postData }) {
-//   return (
-//     <Layout>
-//       <Head>
-//         <title>{postData.title}</title>
-//       </Head>
-//       <article>
-//         <h1 className={utilStyles.headingXl}>{postData.title}</h1>
-//         <div className={utilStyles.lightText}>
-//           <Date dateString={postData.date} />
-//         </div>
-//         <div dangerouslySetInnerHTML={{ __html: postData.contentHtml }} />
-//       </article>
-//     </Layout>
-//   )
-// }
