@@ -1,7 +1,8 @@
+import { Key } from "react";
 import { ResponsePaginator } from "./response";
 
 export interface StudentListRecord {
-    key:number,
+    key:Key,
     id: number,
     name: string,
     area: string,

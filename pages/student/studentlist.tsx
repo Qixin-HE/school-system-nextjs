@@ -6,7 +6,7 @@ import {
 import { StudentListRecord } from "../../lib/model/student";
 import { useEffect, useState } from 'react';
 import { getStudentListService, postAddStudentService, postDeleteStudentService, putEditStudentService } from '../../lib/api/service';
-import Item from "antd/lib/list/Item";
+import Link from 'next/link'
 
 interface ColomnFilter {
     text: string,
@@ -108,14 +108,6 @@ const StudentListPage = () => {
 
     };
 
-    //for notification
-    // const openNotificationWithIcon = (type) => {
-    //     notification[type]({
-    //       message: 'Notification Title',
-    //       description:
-    //         'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
-    //     });
-    //   };
 
     const handleCancel = () => {
         setIsAddStudentModalVisible(false);
@@ -216,7 +208,12 @@ const createAreaFilter = () => {
 
 //for search bar
 const { Search } = Input;
-const onSearch = value => console.log(typeof value);
+const onSearch = (query:string) => {
+    getStudentListService(page, limit, query).then(function (result) {
+        setData(result.data);
+        setTotal(result.total);
+    });
+}
 
     return (
         <>
@@ -229,8 +226,43 @@ const onSearch = value => console.log(typeof value);
                 <Button key="add" type="primary" onClick={showAddStudentModal} style={{ marginBottom: "10px" }}>
                     Add
                 </Button>
-                <Search placeholder="enter a student name" onSearch={(value) => onSearch(value)} style={{ width: 500, position:"absolute",right:"2%" }} />
-                <Modal key="addStudent" title="Add Student" mask={false} visible={isAddStudentModalVisible} onOk={handleOk}
+                <Search placeholder="enter a student name" onSearch={(value:string) => onSearch(value)} style={{ width: 500, position:"absolute",right:"2%" }} />
+                
+                <Table dataSource={data} pagination={pagination} onChange={handleTableChange} >
+                    <Column title="No." dataIndex="id" key="id" sorter={(a : StudentListRecord, b:StudentListRecord ) => a.id - b.id } sortDirections= {['descend']}
+    />
+                    <Column title="Name" dataIndex="name" key="name" sorter={(a : StudentListRecord, b:StudentListRecord ) => a.name.length - b.name.length } sortDirections= {['descend']}
+                    render={(text, record: StudentListRecord) =>(
+                        <Link href="/student/[id]" as={`/student/${record.key}`}>
+                    <a>{record.name}</a>
+                    </Link>
+                    )}/>
+                    <Column title="Area" dataIndex="area" key="area" filters={createAreaFilter()} onFilter={(value, record : StudentListRecord) => record.area.toLowerCase() === value}/>
+                    <Column title="Email" dataIndex="email" key="email" />
+                    <Column title="Selected Curriculum" dataIndex="selectedCurriculum" key="selectedCurriculum" />
+                    <Column title="Student Type" dataIndex="studentType" key="studentType" />
+                    <Column title="Join Time" dataIndex="joinTime" key="joinTime" />
+                    <Column
+                        title="Action"
+                        key="action"
+                        render={(text, record: { key: React.Key }) => (
+                            <Space size="middle">
+                                <a onClick={() => showEditStudentModal(record.key.toString())}>Edit</a>
+                                
+
+                                {data.length >= 1 ? (
+                                    <Popconfirm title="Sure to delete?" onConfirm={() => { deleteAStudent(record.key.toString()) }}>
+                                        <a>Delete</a>
+                                    </Popconfirm>
+                                ) : null}
+
+                            </Space>
+                        )}
+                    />
+                </Table>
+            </Dashboard>
+            {/* The Add Student Modal */}
+            <Modal key="addStudent" title="Add Student" mask={false} visible={isAddStudentModalVisible} onOk={handleOk}
                     onCancel={handleCancel} footer={[
                         <Button key="add" type="primary" onClick={handleUpdate}>
                             Add
@@ -297,23 +329,8 @@ const onSearch = value => console.log(typeof value);
                         </Form.Item>
                     </Form>
                 </Modal>
-                <Table dataSource={data} pagination={pagination} onChange={handleTableChange} >
-                    <Column title="No." dataIndex="id" key="id" sorter={(a : StudentListRecord, b:StudentListRecord ) => a.id - b.id } sortDirections= {['descend']}
-    />
-                    <Column title="Name" dataIndex="name" key="name" sorter={(a : StudentListRecord, b:StudentListRecord ) => a.name.length - b.name.length } sortDirections= {['descend']}/>
-                    <Column title="Area" dataIndex="area" key="area" filters={createAreaFilter()} onFilter={(value, record : StudentListRecord) => record.area.toLowerCase() === value}/>
-                    <Column title="Email" dataIndex="email" key="email" />
-                    <Column title="Selected Curriculum" dataIndex="selectedCurriculum" key="selectedCurriculum" />
-                    <Column title="Student Type" dataIndex="studentType" key="studentType" />
-                    <Column title="Join Time" dataIndex="joinTime" key="joinTime" />
-                    <Column
-                        title="Action"
-                        key="action"
-                        render={(text, record: { key: React.Key }) => (
-                            <Space size="middle">
-                                <a onClick={() => showEditStudentModal(record.key.toString())}>Edit</a>
-                                {/* 第二个modal */}
-                                <Modal title="Edit Student" mask={false} destroyOnClose
+                {/* 第二个modal */}
+                <Modal title="Edit Student" mask={false} destroyOnClose
                                     visible={isEditStudentModalVisible}
                                     onCancel={onEditStudentModalClose} footer={[
                                         <Button key="update" type="primary" onClick={handleUpdate}>
@@ -390,18 +407,6 @@ const onSearch = value => console.log(typeof value);
                                     </Form>
                                 </Modal>
 
-
-                                {data.length >= 1 ? (
-                                    <Popconfirm title="Sure to delete?" onConfirm={() => { deleteAStudent(record.key.toString()) }}>
-                                        <a>Delete</a>
-                                    </Popconfirm>
-                                ) : null}
-
-                            </Space>
-                        )}
-                    />
-                </Table>
-            </Dashboard>
         </>
     )
 }

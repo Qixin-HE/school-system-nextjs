@@ -2,17 +2,25 @@ import { getService, postService, deleteService, putService } from './baseServic
 import { getStudentResponse, Student, StudentListRecord, postStudent, editPutStudent } from "../model/student";
 import { TeacherListRecord, TeacherResponse, Teacher } from "../model/teacher";
 import { AxiosResponse } from 'axios';
+import { Key } from 'react';
 
 
-export const getStudentListService = async (page?: number, limit?: number): Promise<any> => {
+export const getStudentListService = async (page?: number, limit?: number,query?:string): Promise<any> => {
     var rows: StudentListRecord[] = [];
     var value: getStudentResponse;
     if (page == undefined || limit == undefined) {
         page = 1;
         limit = 10;
     }
+    let path = `students?page=${page}&limit=${limit}`;
+    if (query !== undefined){
+path += `&query=${query}`
+    }
+    // if (id !== undefined){
+    //     path += `&id=${id}`
+    // }
 
-    return await getService(`students?page=${page}&limit=${limit}`).then(function (response: AxiosResponse) {
+    return await getService(path).then(function (response: AxiosResponse) {
         value = response.data.data;
         //console.log(value)
 
@@ -43,7 +51,7 @@ export const getStudentListService = async (page?: number, limit?: number): Prom
 
         studentRecords.forEach(e => {
             const studentItem: StudentListRecord = {
-                key: e.id,
+                key: e.id as Key,
                 id: e.id,
                 name: e.name,
                 area: e.country,
@@ -168,3 +176,29 @@ export const putEditStudentService = async (data: editPutStudent): Promise<any> 
             console.log(error);
         });
 };
+
+//not using for now
+export const getAStudentByIDService = async(id:string): Promise<any> => {
+    let rows: StudentListRecord[] = [];
+    let value: getStudentResponse;
+
+    return await getService(`students/${id}`).then(function (response: AxiosResponse) {
+        value = response.data.data;
+        
+        
+        //console.log(value)
+
+    }).catch(function (error) {
+        // handle error
+        console.log(error);
+    }).then(function () {
+
+       
+
+        
+
+    
+        return value;
+    })
+};
+

@@ -1,5 +1,6 @@
-问题：
-1.edit student 无法更改type（student type)
+search a student -> service.ts(search a student using an id) -> using get student with axios
+//已解决问题：
+1.edit student 无法更改type（student type) - 是1和2 而不是0或1
 //
 form control: edit student 
 try1: default value x (actually null in the form value field)
