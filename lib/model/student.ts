@@ -22,18 +22,7 @@ interface Course {
     courseId: number,
     name: string, 
 }
-export interface Student {
-    createdAt: string,
-    updatedAt: string,
-    id: number,
-    email: string,
-    name: string,
-    country: string,
-    profileId: number,
-    type: StudentType,
-    courses: Course[],
 
-}
 export interface getStudentResponse {
     total: number,
     students: Student[],
@@ -49,4 +38,33 @@ export interface postStudent {
 }
 export interface editPutStudent extends postStudent{
     id: number
+}
+
+export interface Address {
+    place: string
+}
+
+export interface Student {
+    createdAt: string,
+    updatedAt: string,
+    id: number,
+    email: string,
+    name: string,
+    country: string,
+    profileId: number,
+    type: StudentType,
+    courses: Course[],
+
+}
+export interface StudentDetail extends Student{
+    address:  Address[],
+    age: number,
+    avatar: string,
+    description: string,
+    education:  string,
+    gender: number,
+    interest: string[],
+    memberEndAt: string,
+    memberStartAt: string,
+    phone: string
 }
