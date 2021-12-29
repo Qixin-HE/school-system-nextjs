@@ -9,7 +9,7 @@ import {
 } from 'antd';
 import { ResponsePaginator } from '../lib/model/response';
 import { TeacherResponse, Teacher, TeacherListRecord } from '../lib/model/teacher';
-import { getTeacherListService, postDeleteTeacherService } from "../lib/api/teacherService";
+import { getTeacherListService, postDeleteTeacherService, postAddTeacherService } from "../lib/api/teacherService";
 
 
 
@@ -67,9 +67,7 @@ const TeacherListPage = () => {
     const [modalTitle, setModalTitle] = useState<string>();
     const [modaleButtonName, setModaleButtonName] = useState<string>();
 
-    const modaleButtonOnClick = () => {
-        console.log(modaleButtonName);
-    }
+
     const [rowKey, setRowKey] = useState<string>("");
     const showEditTeacherModal = (key: string) => {
         setRowKey(key)
@@ -110,6 +108,55 @@ const TeacherListPage = () => {
         
     }, [isModalVisible]);
 
+    const modaleButtonOnClick = () => {
+        
+        if (modalTitle == "Add Teacher"){
+            console.log("add teacher");
+            console.log(name, email, area, phone);
+            name == undefined ? setName(form.getFieldValue("name")) : null;
+            email == undefined ? setEmail(form.getFieldValue("email")) : null;
+            area == undefined ? setArea(form.getFieldValue("area")) : null;
+            phone == undefined ? setPhone(form.getFieldValue("phone")) : null;
+            console.log("second");
+            console.log(name, email, area, phone);
+            if (name != undefined && email != undefined && area != undefined && phone != undefined) {
+                const postResult = postAddTeacherService(
+                    {
+                        name: name,
+                        email: email,
+                        country: area,
+                        phone: phone,
+                        skills: []
+                    }).then(function (response) {
+    
+                        if (response.status == true) {
+                            message.success(`Student ${name} with id ${response.id} has been added successfully!`);
+                            setUpdateTrigger(updateTrigger + 1);
+                        } else {
+                            message.error('Something went wrong. Try again~');
+                        }
+    
+                    });
+    
+            } else {
+                message.error('Something went wrong. Try again!');
+                console.log("here comes else" +
+                    JSON.stringify({
+                        name: name,
+                        email: email,
+                        country: area,
+                        phone: phone
+                    }))
+            }
+        }
+        
+
+
+
+        setIsModalVisible(false);
+
+    };
+
     if (data == undefined) {
         return (<p>loading</p>)
     }
@@ -124,6 +171,7 @@ const TeacherListPage = () => {
                 </Breadcrumb>
                 <Button key="add" type="primary" onClick={() => {
                     setModalTitle("Add Teacher");
+                    setModaleButtonName("Add Teacher")
         setIsModalVisible(true);
     }} style={{ marginBottom: "10px" }}>
                     Add
@@ -193,9 +241,9 @@ const TeacherListPage = () => {
                             <Option value="zimbabwe">Zimbabwe</Option>
                             <Option value="lebanon">Lebanon</Option>
                             <Option value="other">Other</Option>
-                            {data.filter(teacher => teacher.id.toString() == rowKey)[0] != undefined &&
-                                data.filter(teacher => teacher.id.toString() == rowKey)[0].country !== "china" || "zimbabwe" || "lebanon" 
-                                && modalTitle !== "Add Teacher" ? (
+                            {(data.filter(teacher => teacher.id.toString() == rowKey)[0] != undefined) &&
+                                (data.filter(teacher => teacher.id.toString() == rowKey)[0].country !== "china" || "zimbabwe" || "lebanon" )
+                                && (modalTitle !== "Add Teacher") ? (
                                     <Option key="initialselectvalue" value={data.filter(student => student.id.toString() == rowKey)[0] != undefined ? data.filter(student => student.id.toString() == rowKey)[0].country : "null"}>
                                         {data.filter(student => student.id.toString() == rowKey)[0] != undefined ? data.filter(student => student.id.toString() == rowKey)[0].country : "null"}
                                     </Option>

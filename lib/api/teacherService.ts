@@ -1,4 +1,4 @@
-import { TeacherListRecord, TeacherResponse, Teacher } from "../model/teacher";
+import { TeacherListRecord, TeacherResponse, Teacher, postTeacher } from "../model/teacher";
 import { AxiosResponse } from 'axios';
 import { Key } from 'react';
 import { getService, postService, deleteService, putService } from './baseService';
@@ -52,6 +52,26 @@ export const postDeleteTeacherService= async (id: string): Promise<any> => {
         return true
          }else {
             return false;
+        }
+
+    })
+        .catch(function (error) {
+            console.log(error);
+        });
+};
+
+export const postAddTeacherService = async (data: postTeacher): Promise<any> => {
+
+
+    return await postService("teachers", data).then(function (response: AxiosResponse) {
+        const status = response.data;
+
+
+        console.log(`Status:  ${JSON.stringify(status)}`)
+        if (status.msg == "success"){
+        return {status: true,
+        id: status.data.profileId}; }else {
+            return {status: false};
         }
 
     })

@@ -31,3 +31,11 @@ export interface TeacherListRecord {
     courseAmount: number,
     phone: string
 }
+
+export interface postTeacher {
+    name:string,
+    country:string,
+    phone:string,
+    skills:string[],
+    email:string
+}
