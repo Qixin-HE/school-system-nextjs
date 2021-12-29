@@ -9,7 +9,8 @@ import {
 } from 'antd';
 import { ResponsePaginator } from '../lib/model/response';
 import { TeacherResponse, Teacher, TeacherListRecord } from '../lib/model/teacher';
-import { getTeacherListService, postDeleteTeacherService, postAddTeacherService } from "../lib/api/teacherService";
+import { getTeacherListService, postDeleteTeacherService, postAddTeacherService,
+    putEditTeacherService } from "../lib/api/teacherService";
 
 
 
@@ -149,7 +150,22 @@ const TeacherListPage = () => {
                     }))
             }
         }
-        
+        if (modalTitle == "Edit Teacher"){
+            const formTeacherValues = form.getFieldsValue();
+
+            const editedTeacher = {
+                "id": parseInt(rowKey),
+                "email": formTeacherValues.email,
+                "name": formTeacherValues.name,
+                "country": formTeacherValues.area,
+                "phone": formTeacherValues.phone,
+                "skills": []
+            }
+    
+            putEditTeacherService(editedTeacher);
+            setUpdateTrigger(updateTrigger + 1);
+
+        }
 
 
 
@@ -191,7 +207,9 @@ const TeacherListPage = () => {
                             <Space size="middle">
                                 <a onClick={() => {
                                     setModalTitle("Edit Teacher")
-                                    showEditTeacherModal(record.key.toString())}}>Edit</a>
+                                    showEditTeacherModal(record.key.toString())
+                                    setModaleButtonName("Edit Teacher")
+                                    }}>Edit</a>
 
 
                                 {data.length >= 1 ? (

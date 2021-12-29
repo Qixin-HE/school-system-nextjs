@@ -79,3 +79,16 @@ export const postAddTeacherService = async (data: postTeacher): Promise<any> => 
             console.log(error);
         });
 };
+
+export const putEditTeacherService = async (data: postTeacher): Promise<any> => {
+
+
+    return await putService("teachers", data).then(function (response: AxiosResponse) {
+        const status = response.data;
+        console.log(status)
+
+    })
+        .catch(function (error) {
+            console.log(error);
+        });
+};
