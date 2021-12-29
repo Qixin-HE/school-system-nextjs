@@ -5,13 +5,13 @@ import {
 } from 'antd';
 import { StudentListRecord } from "../../lib/model/student";
 import { useEffect, useState } from 'react';
-import { getStudentListService, postAddStudentService, postDeleteStudentService, putEditStudentService } from '../../lib/api/service';
+import { getStudentListService, postAddStudentService, postDeleteStudentService, putEditStudentService } from '../../lib/api/studentService';
 import Link from 'next/link'
 
-interface ColomnFilter {
-    text: string,
-    value: string
-}
+// interface ColomnFilter {
+//     text: string,
+//     value: string
+// }
 
 const StudentListPage = () => {
 

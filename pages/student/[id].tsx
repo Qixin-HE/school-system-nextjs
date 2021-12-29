@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { getAStudentByIDService } from '../../lib/api/service'
+import { getAStudentByIDService } from '../../lib/api/studentService'
 import { useState, useEffect } from 'react'
 import { StudentDetail, CourseStudentDetail } from '../../lib/model/student';
 import {

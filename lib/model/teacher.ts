@@ -22,6 +22,7 @@ export interface TeacherResponse {
 
 }
 export interface TeacherListRecord {
+    key: number,
     id: number,
     name: string,
     country: string,
