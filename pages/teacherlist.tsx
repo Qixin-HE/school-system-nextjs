@@ -9,8 +9,10 @@ import {
 } from 'antd';
 import { ResponsePaginator } from '../lib/model/response';
 import { TeacherResponse, Teacher, TeacherListRecord } from '../lib/model/teacher';
-import { getTeacherListService, postDeleteTeacherService, postAddTeacherService,
-    putEditTeacherService } from "../lib/api/teacherService";
+import {
+    getTeacherListService, postDeleteTeacherService, postAddTeacherService,
+    putEditTeacherService
+} from "../lib/api/teacherService";
 
 
 
@@ -31,7 +33,7 @@ const TeacherListPage = () => {
             setTotal(result.total);
             //console.log("total is" + total)
             console.log("here")
-            
+
         });
         console.log(data);
         console.log(pagination);
@@ -93,8 +95,7 @@ const TeacherListPage = () => {
     // to update field in the "Edit Teacher " Modal
     useEffect(() => {
         //console.log(modaleButtonName)
-        if (modalTitle == "Edit Teacher" && data !== undefined)
-        {
+        if (modalTitle == "Edit Teacher" && data !== undefined) {
             console.log("it is trigger!")
             const teacher = data.filter(teacher => teacher.id.toString() == rowKey)[0];
             if (teacher != undefined) {
@@ -106,12 +107,12 @@ const TeacherListPage = () => {
                 });
             }
         }
-        
+
     }, [isModalVisible]);
 
     const modaleButtonOnClick = () => {
-        
-        if (modalTitle == "Add Teacher"){
+
+        if (modalTitle == "Add Teacher") {
             console.log("add teacher");
             console.log(name, email, area, phone);
             name == undefined ? setName(form.getFieldValue("name")) : null;
@@ -129,16 +130,16 @@ const TeacherListPage = () => {
                         phone: phone,
                         skills: []
                     }).then(function (response) {
-    
+
                         if (response.status == true) {
                             message.success(`Student ${name} with id ${response.id} has been added successfully!`);
                             setUpdateTrigger(updateTrigger + 1);
                         } else {
                             message.error('Something went wrong. Try again~');
                         }
-    
+
                     });
-    
+
             } else {
                 message.error('Something went wrong. Try again!');
                 console.log("here comes else" +
@@ -150,7 +151,7 @@ const TeacherListPage = () => {
                     }))
             }
         }
-        if (modalTitle == "Edit Teacher"){
+        if (modalTitle == "Edit Teacher") {
             const formTeacherValues = form.getFieldsValue();
 
             const editedTeacher = {
@@ -161,7 +162,7 @@ const TeacherListPage = () => {
                 "phone": formTeacherValues.phone,
                 "skills": []
             }
-    
+
             putEditTeacherService(editedTeacher);
             setUpdateTrigger(updateTrigger + 1);
 
@@ -173,16 +174,31 @@ const TeacherListPage = () => {
 
     };
     //for search bar
-const { Search } = Input;
-    const onSearch = (query:string) => {
+    const { Search } = Input;
+    const onSearch = (query: string) => {
         getTeacherListService(page, limit, query).then(function (result) {
             setData(result.data);
             setTotal(result.total);
         });
     }
 
+
+
     if (data == undefined) {
         return (<p>loading</p>)
+    }
+    // for country colomn sorter
+    const createCountryFilter = () => {
+        const countries = new Set(data.map(teacher => teacher.country));
+        let filter: any[] = []
+        countries.forEach(country => {
+            const filterObject = {
+                text: country,
+                value: country.toLowerCase()
+            }
+            filter.push(filterObject)
+        })
+        return filter;
     }
 
     return (
@@ -196,15 +212,21 @@ const { Search } = Input;
                 <Button key="add" type="primary" onClick={() => {
                     setModalTitle("Add Teacher");
                     setModaleButtonName("Add Teacher")
-        setIsModalVisible(true);
-    }} style={{ marginBottom: "10px" }}>
+                    setIsModalVisible(true);
+                }} style={{ marginBottom: "10px" }}>
                     Add
                 </Button>
-                <Search placeholder="enter a teacher name" onSearch={(value:string) => onSearch(value)} style={{ width: 500, position:"absolute",right:"2%" }} />
+                <Search placeholder="enter a teacher name" onSearch={(value: string) => onSearch(value)} style={{ width: 500, position: "absolute", right: "2%" }} />
                 <Table dataSource={data} pagination={pagination} onChange={handleTableChange}>
-                    <Column title="No." dataIndex="id" key="id" />
-                    <Column title="Name" dataIndex="name" key="name" />
-                    <Column title="Country" dataIndex="country" key="country" />
+                    <Column title="No." dataIndex="id" key="id"
+                        sorter={(a: TeacherListRecord, b: TeacherListRecord) => a.id - b.id} sortDirections={['descend']}
+                    />
+                    <Column title="Name" dataIndex="name" key="name"
+                        sorter={(a: TeacherListRecord, b: TeacherListRecord) => a.name.length - b.name.length} sortDirections={['descend']}
+                    />
+                    <Column title="Country" dataIndex="country" key="country"
+                        filters={createCountryFilter()} onFilter={(value, record: TeacherListRecord) => record.country.toLowerCase() === value}
+                    />
                     <Column title="Email" dataIndex="email" key="email" />
                     <Column title="Skill" dataIndex="skill" key="skill" />
                     <Column title="Course Amount" dataIndex="courseAmount" key="courseAmount" />
@@ -218,7 +240,7 @@ const { Search } = Input;
                                     setModalTitle("Edit Teacher")
                                     showEditTeacherModal(record.key.toString())
                                     setModaleButtonName("Edit Teacher")
-                                    }}>Edit</a>
+                                }}>Edit</a>
 
 
                                 {data.length >= 1 ? (
@@ -244,7 +266,7 @@ const { Search } = Input;
 
                 ]}>
                 <Form {...layout} form={form} name="control-hooks" preserve={false}>
-                    
+
                     <Form.Item name="name" label="Name" rules={[{ required: true }]}>
                         <Input onChange={e => {
                             form.setFieldsValue({ name: e.target.value });
@@ -269,12 +291,12 @@ const { Search } = Input;
                             <Option value="lebanon">Lebanon</Option>
                             <Option value="other">Other</Option>
                             {(data.filter(teacher => teacher.id.toString() == rowKey)[0] != undefined) &&
-                                (data.filter(teacher => teacher.id.toString() == rowKey)[0].country !== "china" || "zimbabwe" || "lebanon" )
+                                (data.filter(teacher => teacher.id.toString() == rowKey)[0].country !== "china" || "zimbabwe" || "lebanon")
                                 && (modalTitle !== "Add Teacher") ? (
-                                    <Option key="initialselectvalue" value={data.filter(student => student.id.toString() == rowKey)[0] != undefined ? data.filter(student => student.id.toString() == rowKey)[0].country : "null"}>
-                                        {data.filter(student => student.id.toString() == rowKey)[0] != undefined ? data.filter(student => student.id.toString() == rowKey)[0].country : "null"}
-                                    </Option>
-                                ) : undefined
+                                <Option key="initialselectvalue" value={data.filter(student => student.id.toString() == rowKey)[0] != undefined ? data.filter(student => student.id.toString() == rowKey)[0].country : "null"}>
+                                    {data.filter(student => student.id.toString() == rowKey)[0] != undefined ? data.filter(student => student.id.toString() == rowKey)[0].country : "null"}
+                                </Option>
+                            ) : undefined
                             }
 
                         </Select>
