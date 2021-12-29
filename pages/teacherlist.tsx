@@ -172,6 +172,14 @@ const TeacherListPage = () => {
         setIsModalVisible(false);
 
     };
+    //for search bar
+const { Search } = Input;
+    const onSearch = (query:string) => {
+        getTeacherListService(page, limit, query).then(function (result) {
+            setData(result.data);
+            setTotal(result.total);
+        });
+    }
 
     if (data == undefined) {
         return (<p>loading</p>)
@@ -192,6 +200,7 @@ const TeacherListPage = () => {
     }} style={{ marginBottom: "10px" }}>
                     Add
                 </Button>
+                <Search placeholder="enter a teacher name" onSearch={(value:string) => onSearch(value)} style={{ width: 500, position:"absolute",right:"2%" }} />
                 <Table dataSource={data} pagination={pagination} onChange={handleTableChange}>
                     <Column title="No." dataIndex="id" key="id" />
                     <Column title="Name" dataIndex="name" key="name" />

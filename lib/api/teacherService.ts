@@ -3,18 +3,21 @@ import { AxiosResponse } from 'axios';
 import { Key } from 'react';
 import { getService, postService, deleteService, putService } from './baseService';
 
-export const getTeacherListService = async (page?: number, limit?: number): Promise<any> => {
+export const getTeacherListService = async (page?: number, limit?: number, query?: string): Promise<any> => {
     var rows: TeacherListRecord[] = [];
     var value: TeacherResponse;
     if (page == undefined || limit == undefined) {
         page = 1;
-        limit = 20;
+        limit = 10;
+    }
+    let path = `teachers?page=${page}&limit=${limit}`;
+    if (query !== undefined) {
+        path += `&query=${query}`
     }
 
-    return await getService(`teachers?page=${page}&limit=${limit}`).then(function (response: AxiosResponse) {
+    return await getService(path).then(function (response: AxiosResponse) {
         value = response.data.data;
         //console.log(value)
-
 
     }).catch(function (error) {
         console.log(error);
@@ -40,7 +43,7 @@ export const getTeacherListService = async (page?: number, limit?: number): Prom
     )
 };
 
-export const postDeleteTeacherService= async (id: string): Promise<any> => {
+export const postDeleteTeacherService = async (id: string): Promise<any> => {
 
 
     return await deleteService(`teachers/${id}`).then(function (response: AxiosResponse) {
@@ -48,9 +51,9 @@ export const postDeleteTeacherService= async (id: string): Promise<any> => {
 
 
         //console.log(`Status:  ${JSON.stringify(status)}`)
-        if (status.msg == "success"){
-        return true
-         }else {
+        if (status.msg == "success") {
+            return true
+        } else {
             return false;
         }
 
@@ -68,10 +71,13 @@ export const postAddTeacherService = async (data: postTeacher): Promise<any> => 
 
 
         console.log(`Status:  ${JSON.stringify(status)}`)
-        if (status.msg == "success"){
-        return {status: true,
-        id: status.data.profileId}; }else {
-            return {status: false};
+        if (status.msg == "success") {
+            return {
+                status: true,
+                id: status.data.profileId
+            };
+        } else {
+            return { status: false };
         }
 
     })
