@@ -56,7 +56,7 @@ path += `&query=${query}`
                 name: e.name,
                 area: e.country,
                 email: e.email,
-                selectedCurriculum: e.courses.map(item => item.name).join(","),
+                selectedCurriculum: e.courses !== undefined ? e.courses.map(item => item.name).join(",") : "",
                 studentType: e.type != null ? e.type.name : "null",
                 joinTime: calculateJoinTime(e.createdAt)
             }

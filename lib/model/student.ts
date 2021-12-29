@@ -2,7 +2,7 @@ import { Key } from "react";
 import { ResponsePaginator } from "./response";
 
 export interface StudentListRecord {
-    key:Key,
+    key: Key,
     id: number,
     name: string,
     area: string,
@@ -17,10 +17,12 @@ interface StudentType {
     id: number,
     name: StudentTypeName
 }
-interface Course {
-    id: number,
-    courseId: number,
-    name: string, 
+
+
+export interface CourseStudentDetail extends Course {
+    key: number,
+    type: string,
+    joinTime: string
 }
 
 export interface getStudentResponse {
@@ -29,14 +31,18 @@ export interface getStudentResponse {
     paginator: ResponsePaginator
 }
 
+// export interface getStudentDetailResponse extends Student {
+
+// }
+
 export interface postStudent {
-    
-    name:string,
+
+    name: string,
     country: string,
     email: string,
     type: number
 }
-export interface editPutStudent extends postStudent{
+export interface editPutStudent extends postStudent {
     id: number
 }
 
@@ -53,18 +59,38 @@ export interface Student {
     country: string,
     profileId: number,
     type: StudentType,
-    courses: Course[],
+    courses?: Course[],
 
 }
-export interface StudentDetail extends Student{
-    address:  Address[],
+
+interface StudentDetailCourseType {
+    id: number,
+    name: string
+}
+interface Course {
+    id: number,
+    courseId?: number,
+    name: string,
+}
+
+interface StudentDetailCourse extends Course {
+    courseDate: string,
+    createdAt: string,
+    studentId: number,
+    type: StudentDetailCourseType[],
+    updatedAt: string
+}
+
+export interface StudentDetail extends Student {
+    address: Address[],
     age: number,
     avatar: string,
     description: string,
-    education:  string,
+    education: string,
     gender: number,
     interest: string[],
     memberEndAt: string,
     memberStartAt: string,
-    phone: string
+    phone: string,
+    courses: StudentDetailCourse[]
 }
