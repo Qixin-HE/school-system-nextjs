@@ -110,7 +110,7 @@ const Dashboard = ({ children }: any) => {
 
                             <SubMenu key="sub2" icon={<UserOutlined />} title="Teacher">
                                 <Menu.Item key="4" icon={< TeamOutlined />}>
-                                    <Link href="/teacherlist">
+                                    <Link href="/teacher/teacherlist">
                                         Teacher List
                                     </Link>
                                 </Menu.Item>

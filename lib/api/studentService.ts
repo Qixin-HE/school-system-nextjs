@@ -143,7 +143,7 @@ export const putEditStudentService = async (data: editPutStudent): Promise<any> 
         });
 };
 
-//not using for now
+
 export const getAStudentByIDService = async(id:string): Promise<any> => {
     let rows: StudentListRecord[] = [];
     let value: getStudentResponse;
@@ -158,11 +158,6 @@ export const getAStudentByIDService = async(id:string): Promise<any> => {
         // handle error
         console.log(error);
     }).then(function () {
-
-       
-
-        
-
     
         return value;
     })

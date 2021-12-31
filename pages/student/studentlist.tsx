@@ -8,10 +8,6 @@ import { useEffect, useState } from 'react';
 import { getStudentListService, postAddStudentService, postDeleteStudentService, putEditStudentService } from '../../lib/api/studentService';
 import Link from 'next/link'
 
-// interface ColomnFilter {
-//     text: string,
-//     value: string
-// }
 
 const StudentListPage = () => {
 

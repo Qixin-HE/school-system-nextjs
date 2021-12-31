@@ -1,18 +1,18 @@
-import Dashboard from "../components/Dashboard";
+import Dashboard from "../../components/Dashboard";
 import Link from 'next/link';
-import { getService } from "../lib/api/baseService";
+import { getService } from "../../lib/api/baseService";
 import { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import {
     Space, Breadcrumb, Table, TablePaginationConfig, Modal, Button,
     Form, Input, Select, Popconfirm, message
 } from 'antd';
-import { ResponsePaginator } from '../lib/model/response';
-import { TeacherResponse, Teacher, TeacherListRecord } from '../lib/model/teacher';
+import { ResponsePaginator } from '../../lib/model/response';
+import { TeacherResponse, Teacher, TeacherListRecord } from '../../lib/model/teacher';
 import {
     getTeacherListService, postDeleteTeacherService, postAddTeacherService,
     putEditTeacherService
-} from "../lib/api/teacherService";
+} from "../../lib/api/teacherService";
 
 
 
@@ -223,6 +223,11 @@ const TeacherListPage = () => {
                     />
                     <Column title="Name" dataIndex="name" key="name"
                         sorter={(a: TeacherListRecord, b: TeacherListRecord) => a.name.length - b.name.length} sortDirections={['descend']}
+                        render={(text, record: TeacherListRecord) =>(
+                            <Link href="/teacher/[id]" as={`/teacher/${record.key}`}>
+                        <a>{record.name}</a>
+                        </Link>
+                        )}
                     />
                     <Column title="Country" dataIndex="country" key="country"
                         filters={createCountryFilter()} onFilter={(value, record: TeacherListRecord) => record.country.toLowerCase() === value}

@@ -1,4 +1,4 @@
-import { TeacherListRecord, TeacherResponse, Teacher, postTeacher } from "../model/teacher";
+import { TeacherListRecord, TeacherResponse, Teacher, postTeacher, getTeacherDetailResponse } from "../model/teacher";
 import { AxiosResponse } from 'axios';
 import { Key } from 'react';
 import { getService, postService, deleteService, putService } from './baseService';
@@ -97,4 +97,22 @@ export const putEditTeacherService = async (data: postTeacher): Promise<any> => 
         .catch(function (error) {
             console.log(error);
         });
+};
+
+export const getATeacherByIDService = async(id:string): Promise<any> => {
+    let rows: TeacherListRecord[] = [];
+    let value: getTeacherDetailResponse ;
+
+    return await getService(`teachers/${id}`).then(function (response: AxiosResponse) {
+        value = response.data.data;
+                
+        //console.log(value)
+
+    }).catch(function (error) {
+        // handle error
+        console.log(error);
+    }).then(function () {
+    
+        return value;
+    })
 };

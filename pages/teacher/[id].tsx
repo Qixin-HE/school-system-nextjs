@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router'
-import { getAStudentByIDService } from '../../lib/api/studentService'
+import { getATeacherByIDService } from '../../lib/api/teacherService';
 import { useState, useEffect } from 'react'
-import { StudentDetail, CourseStudentDetail } from '../../lib/model/student';
+import { getTeacherDetailResponse } from '../../lib/model/teacher';
 import {
-  Tag, Breadcrumb, Table, TablePaginationConfig, Modal,
+  Tag, Breadcrumb, Table, Rate, Modal,
   Form, Card, Tabs, Layout,
   Row, Col, Avatar, Image
 } from 'antd';
@@ -15,87 +15,55 @@ const StudentDetailPage = () => {
 
   const { id } = router.query
 
-  const [data, setData] = useState<StudentDetail>();
+  const [data, setData] = useState<getTeacherDetailResponse>();
 
 
-  const [courseTabelData, setCourseTabelData] = useState<CourseStudentDetail[]>();
-  // let selectedColor = new Map();
-  // const generateColorForTags = () => {
-  //   console.log("you first enter the function generateColorForTags")
-    
-  //   let tagColorCopy = new Set([...tagColor]);
-  //   if (data !== undefined){
-  //     data.interest.forEach(interest => {
-  //       let findAColor = false;
-  //       const randomIndex = Math.random() * tagColorCopy.size;
-  //       const color = tagColor[randomIndex];
-  //       console.log(randomIndex)
-  //       console.log(tagColorCopy.has(color))
-  //       // while (findAColor == false) {
-  //       //   const color = tagColor[Math.random() * tagColorCopy.size];
-  //       //   console.log(color)
-  //       //   console.log(tagColorCopy.has(color))
-  //       //   console.log(tagColorCopy)
-  //       //   if (tagColorCopy.has(color)) {
-  
-  //       //     tagColorCopy.delete(color)
-  //       //     console.log(tagColorCopy.has(color))
-  //       //     selectedColor.set(interest, color);
-  //       //     findAColor = true;
-  //       //   }
-  //       //   console.log("end while loop")
-  //       // }
-    
-    
-  //   })
-  // }
-  // }
+  // const [courseTabelData, setCourseTabelData] = useState<CourseStudentDetail[]>();
+
 
   useEffect(() => {
     if (id !== undefined) {
-      getAStudentByIDService(id.toString()).then(function (result) {
+      getATeacherByIDService(id.toString()).then(function (result) {
         setData(result);
 
         console.log(result);
-        
+
 
       });
     }
 
   }, [router]);
 
+  // transform data in tab2 in the tabel
+  // useEffect(() => {
 
-  useEffect(() => {
+  //   if (data !== undefined) {
+  //     let courses: CourseStudentDetail[] = [];
+  //     data.courses.forEach(course => {
 
-    if (data !== undefined) {
-      let courses: CourseStudentDetail[] = [];
-      data.courses.forEach(course => {
+  //       const aCourse = {
+  //         key: course.id,
+  //         id: course.id,
+  //         name: course.name,
+  //         //做成有多少个type join起来中间加逗号更加make sense
+  //         type: course.type[0] !== undefined ? course.type[0].name : "",
+  //         joinTime: course.createdAt
+  //       }
+  //       courses.push(aCourse);
+  //     })
+  //     setCourseTabelData(courses);
 
-        const aCourse = {
-          key: course.id,
-          id: course.id,
-          name: course.name,
-          //做成有多少个type join起来中间加逗号更加make sense
-          type: course.type[0] !== undefined ? course.type[0].name : "",
-          joinTime: course.createdAt
-        }
-        courses.push(aCourse);
-      })
-      setCourseTabelData(courses);
-      // generateColorForTags();
-      // console.log("you are in the useEffect after line generateColorForTags")
-      // console.log(selectedColor)
 
-    }
+  //   }
 
-  }, [data]);
+  // }, [data]);
 
   const { Header, Footer, Sider, Content } = Layout;
 
   if (data == undefined) {
     return (<p>loading</p>)
   }
-  
+
 
   const { TabPane } = Tabs;
 
@@ -119,7 +87,7 @@ const StudentDetailPage = () => {
         <Content style={{ height: "100vh", marginLeft: "20px" }}>
           <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>CMS MANAGER SYSTEM</Breadcrumb.Item>
-            <Breadcrumb.Item><Link href="/student/studentlist">Student</Link></Breadcrumb.Item>
+            <Breadcrumb.Item><Link href="/teacher/teacherlist">Teacher</Link></Breadcrumb.Item>
             <Breadcrumb.Item>Detail</Breadcrumb.Item>
           </Breadcrumb>
           <div className="space-align-block" style={{ backgroundColor: "white" }}>
@@ -136,12 +104,11 @@ const StudentDetailPage = () => {
                       <br />
                     </Col>
                     <Col span={8}>
-                      <strong>Age</strong>
-                      <p>
-                        {data.age}
-                      </p><br />
+
                       <strong>Phone</strong>
                       <p>{data.phone}</p><br />
+                      <strong>Country</strong>
+                      <p>{data.country}</p><br />
                     </Col>
 
                   </Row>
@@ -149,7 +116,7 @@ const StudentDetailPage = () => {
                   <Row justify="center">
                     <Col>
                       <strong>Address</strong>
-                      <p>{data.address}</p>
+                      <p>{data.profile.address}</p>
                     </Col>
                   </Row>
 
@@ -166,42 +133,44 @@ const StudentDetailPage = () => {
 
                       <Row gutter={[16, 24]}>
                         <Col className="gutter-row" span={4}>
-                          <strong>Educations:</strong>
+                          <strong>Birthday:</strong>
                           <br /><br />
-                          <strong>Area:</strong>
-                          <br /><br />
+
                           <strong>Gender:</strong>
                           <br /><br />
-                          <strong>Member Period:</strong>
-                          <br /><br />
-                          <strong>Type:</strong><br /><br />
+
+
                           <strong>Create Time:</strong><br /><br />
                           <strong>Update Time:</strong><br /><br />
 
                         </Col>
                         <Col className="gutter-row" span={8}>
-                          {data.education}
+                          {data.profile.birthday}
                           <br /><br />
-                          {data.country}
-                          <br /><br />
-                          {data.gender == 2 ? "Female" : "Male"}<br /><br />
-                          {data.memberStartAt} - {data.memberEndAt}<br /><br />
-                          {data.type.name}<br /><br />
+
+                          {data.profile.gender == 2 ? "Female" : "Male"}<br /><br />
+
+
                           {data.createdAt}<br /><br />
                           {data.updatedAt}<br /><br />
 
                         </Col>
                       </Row>
-                      <Row><Col><br /><h1 style={{ color: "blueviolet" }}>Interesting</h1><br />
-                        {data.interest.map((interest, key) => {
+                      <Row><Col><br /><h1 style={{ color: "blueviolet" }}>Skills</h1><br />
 
-                          return <Tag key={key} color={tagColor[data.interest.indexOf(interest)%(tagColor.length)]}>{interest}</Tag>
-                        })}
 
                       </Col></Row>
+                      {data.skills.map((skill, key) => {
+
+                        return <Row key={key} gutter={[16, 24]}>
+                          <Col className="gutter-row" span={4}><strong>{skill.name}:</strong></Col>
+                          <Col className="gutter-row" span={8}><Rate disabled allowHalf defaultValue={skill.level} /></Col>
+                        </Row>
+
+                      })}
 
                       <Row><Col><br /><h1 style={{ color: "blueviolet" }}>Description</h1><br />
-                        <p>{data.description}</p>
+                        <p>{data.profile.description}</p>
                       </Col>
 
                       </Row>
@@ -209,14 +178,15 @@ const StudentDetailPage = () => {
 
                     </TabPane>
                     <TabPane tab="Courses" key="2">
-                      <Table dataSource={courseTabelData}>
+                      {/* <Table dataSource={courseTabelData}>
                         <Column title="No." dataIndex="id" key="id" />
                         <Column title="Name" dataIndex="name" key="name" />
                         <Column title="Type" dataIndex="type" key="type" />
 
                         <Column title="Join Time" dataIndex="joinTime" key="joinTime" />
 
-                      </Table>
+                      </Table> */}
+                      <p>Here is Courses</p>
                     </TabPane>
 
                   </Tabs>
