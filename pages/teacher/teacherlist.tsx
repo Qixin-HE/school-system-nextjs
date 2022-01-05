@@ -5,7 +5,7 @@ import { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import {
     Space, Breadcrumb, Table, TablePaginationConfig, Modal, Button,
-    Form, Input, Select, Popconfirm, message
+    Form, Input, Select, Popconfirm, message, Rate, Row, Col
 } from 'antd';
 import { ResponsePaginator } from '../../lib/model/response';
 import { TeacherResponse, Teacher, TeacherListRecord } from '../../lib/model/teacher';
@@ -13,8 +13,12 @@ import {
     getTeacherListService, postDeleteTeacherService, postAddTeacherService,
     putEditTeacherService
 } from "../../lib/api/teacherService";
+import { PlusOutlined } from '@ant-design/icons';
 
-
+interface skill {
+    name: string,
+    rate: number
+}
 
 const TeacherListPage = () => {
     const [data, setData] = useState<TeacherListRecord[]>();
@@ -69,6 +73,10 @@ const TeacherListPage = () => {
     const [phone, setPhone] = useState<string>();
     const [modalTitle, setModalTitle] = useState<string>();
     const [modaleButtonName, setModaleButtonName] = useState<string>();
+    const [skill, setSkill] = useState<string>();
+    const [rateValue, setRateValue] = useState<number>();
+    const [skills, setSkills] = useState<skill[]>()
+    
 
 
     const [rowKey, setRowKey] = useState<string>("");
@@ -200,6 +208,7 @@ const TeacherListPage = () => {
         })
         return filter;
     }
+    
 
     return (
         <>
@@ -324,7 +333,54 @@ const TeacherListPage = () => {
                             setPhone(e.target.value)
                         }} />
                     </Form.Item>
-
+                    <Form.Item name="skill" label="Skills" >
+                        <Row>
+                            <Col span={8}>
+                            <Input onChange={e => {
+                            form.setFieldsValue({ skill: e.target.value })
+                            setSkill(e.target.value)
+                        }} />
+                            </Col>
+                            <Col span={12} offset={2}>
+                            <Rate allowHalf value={rateValue} onChange={(value) => setRateValue(value)} />
+                            </Col>
+                            <Col span={2}>
+                            <Button type="primary" shape="circle" icon={<PlusOutlined />} 
+                            onClick={() => {
+                                if (skill !== undefined && rateValue !== undefined) {
+                                    const newSkill : skill = {
+                                        name: skill,
+                                        rate: rateValue
+                                    }
+                                    skills == undefined ? setSkills([newSkill]) : setSkills([
+                                        ...skills,
+                                        newSkill
+                                    ])
+                                }
+                                
+                            }}
+                            />
+                            </Col>
+                        </Row> 
+                        {skills !== undefined ? skills.map((skill,key)=> {
+                            return (<Row key={key} style={{paddingTop: "5px"}}>
+                            <Col span={4} offset={4}>
+                            {skill.name}
+                            </Col>
+                            <Col span={12} offset={2}>
+                            <Rate allowHalf disabled value={skill.rate} />
+                            </Col>
+                            <Col span={2}>
+                            <Button type="primary" shape="circle" icon={<PlusOutlined />} 
+                            onClick={() => {
+                                
+                                
+                            }}
+                            />
+                            </Col>
+                            </Row>)
+                        }): null}                                        
+                    </Form.Item>
 
 
                 </Form>

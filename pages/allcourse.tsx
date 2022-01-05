@@ -1,7 +1,7 @@
 import Dashboard from "../components/Dashboard";
 import Link from 'next/link'
 
-const AllCoursePage = () => {
+const allcourse = () => {
 
     return (
         <>
@@ -21,4 +21,4 @@ const AllCoursePage = () => {
     )
 }
 
-export default AllCoursePage;
+export default allcourse;

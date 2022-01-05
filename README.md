@@ -1,4 +1,22 @@
 Features:
+Course information display:
+- Display all course in a Grid
+
+Work Items:
+All course display:
+(allcourse.tsx)
+    a. create card component
+    one card display for one course on the allcourse page
+    b. import the card component 
+    pass the course information to the card component and display it on the page
+    c. set up grid on the page
+    make the cards auto scale on the page using grid
+
+a. create card component : 
+1)create components/CourseCard.tsx 
+
+//
+Features:
 Teacher information display:
 - All teacher in a list: search, sort, filter
 - Teacher Details
@@ -28,6 +46,14 @@ Work Items:
     change tacherlist.tsx to teacher/teacherlist.tsx; change the link in component/Dashboard.tsx
     b. modify the /student/[id].tsx page, make it align with the teacher details
     delete unrelated details, add "Skills" section, add Rate tag, modify Breadcrumb link
+3. Teacher api service:
+(lib/api/teacherService.ts)
+    a. create teacherService.ts and rename the service.ts to studentService.ts
+    b. move the getTeacherListService() from studentService.ts to the teacherService.ts
+    c. create postDeleteTeacherService() for deleting a techer record by id
+    d. create postAddTeacherService() to add a teacher
+    e. create putEditTeacherService() to edit a teacher
+    f. getATeacherByIDService() to query a teacher and will be used for teacher detail page
     
 
 1.a:
