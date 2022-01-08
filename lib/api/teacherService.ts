@@ -23,6 +23,8 @@ export const getTeacherListService = async (page?: number, limit?: number, query
         console.log(error);
     }).then(function () {
         var rows: any = [];
+        console.log("value from the getlist service")
+        console.log(value)
         const teacherRecords: Teacher[] = value.teachers;
         teacherRecords.forEach(e => {
             const teacherItem: TeacherListRecord = {
@@ -31,7 +33,7 @@ export const getTeacherListService = async (page?: number, limit?: number, query
                 name: e.name,
                 country: e.country,
                 email: e.email,
-                skill: e.skills.map(item => item.name).join(","),
+                skills: e.skills,
                 courseAmount: e.courseAmount,
                 phone: e.phone
             }
@@ -87,7 +89,7 @@ export const postAddTeacherService = async (data: postTeacher): Promise<any> => 
 };
 
 export const putEditTeacherService = async (data: postTeacher): Promise<any> => {
-
+console.log(data)
 
     return await putService("teachers", data).then(function (response: AxiosResponse) {
         const status = response.data;

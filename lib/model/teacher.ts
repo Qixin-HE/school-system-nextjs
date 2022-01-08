@@ -1,6 +1,6 @@
 import { ResponsePaginator } from './response'
 
-interface Skill {
+export interface Skill {
     name: string,
     level: number
 }
@@ -12,12 +12,13 @@ export interface TeacherResponse {
 
 }
 export interface TeacherListRecord {
+    
     key: number,
     id: number,
     name: string,
     country: string,
     email: string,
-    skill: string,
+    skills: Skill[],
     courseAmount: number,
     phone: string
 }
@@ -26,7 +27,7 @@ export interface postTeacher {
     name:string,
     country:string,
     phone:string,
-    skills:string[],
+    skills?:Skill[],
     email:string
 }
 export interface Teacher {

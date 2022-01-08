@@ -1,3 +1,9 @@
+问题：
+1. (solved) style the skills sections on teacher add and edit => todo: change it to rows and cols
+2. skills and rateValue not destroy when modal close (have to set it manually when onClose) 
+    - maybe related to form item
+3. getting 500 (Internal Server Error)when update the skills fields of a teacher from the putEditTeacherService() and then the following getTeacherListService() 
+//
 Features:
 Course information display:
 - Display all course in a Grid

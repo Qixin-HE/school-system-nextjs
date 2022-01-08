@@ -5,20 +5,17 @@ import { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import {
     Space, Breadcrumb, Table, TablePaginationConfig, Modal, Button,
-    Form, Input, Select, Popconfirm, message, Rate, Row, Col
+    Form, Input, Select, Popconfirm, message, Rate, Row, Col, Descriptions
 } from 'antd';
 import { ResponsePaginator } from '../../lib/model/response';
-import { TeacherResponse, Teacher, TeacherListRecord } from '../../lib/model/teacher';
+import { TeacherResponse, Teacher, TeacherListRecord, Skill } from '../../lib/model/teacher';
 import {
     getTeacherListService, postDeleteTeacherService, postAddTeacherService,
     putEditTeacherService
 } from "../../lib/api/teacherService";
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, CloseOutlined } from '@ant-design/icons';
 
-interface skill {
-    name: string,
-    rate: number
-}
+
 
 const TeacherListPage = () => {
     const [data, setData] = useState<TeacherListRecord[]>();
@@ -36,11 +33,11 @@ const TeacherListPage = () => {
             setData(result.data);
             setTotal(result.total);
             //console.log("total is" + total)
-            console.log("here")
+            //console.log("here")
 
         });
-        console.log(data);
-        console.log(pagination);
+        //console.log(data);
+        //console.log(pagination);
 
     }, [page, limit, updateTrigger]);
 
@@ -64,8 +61,9 @@ const TeacherListPage = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const onModalClose = () => {
-
         setIsModalVisible(false)
+        setSkills([])
+        setRateValue(0)
     }
     const [name, setName] = useState<string>();
     const [email, setEmail] = useState<string>();
@@ -74,9 +72,9 @@ const TeacherListPage = () => {
     const [modalTitle, setModalTitle] = useState<string>();
     const [modaleButtonName, setModaleButtonName] = useState<string>();
     const [skill, setSkill] = useState<string>();
-    const [rateValue, setRateValue] = useState<number>();
-    const [skills, setSkills] = useState<skill[]>()
-    
+    const [rateValue, setRateValue] = useState<number>(0);
+    const [skills, setSkills] = useState<Skill[]>()
+
 
 
     const [rowKey, setRowKey] = useState<string>("");
@@ -104,31 +102,41 @@ const TeacherListPage = () => {
     useEffect(() => {
         //console.log(modaleButtonName)
         if (modalTitle == "Edit Teacher" && data !== undefined) {
-            console.log("it is trigger!")
+            //console.log("it is trigger!")
+            setSkill('')
+            setRateValue(0)
             const teacher = data.filter(teacher => teacher.id.toString() == rowKey)[0];
+            
             if (teacher != undefined) {
                 form.setFieldsValue({
                     name: teacher.name,
                     email: teacher.email,
                     area: teacher.country,
-                    phone: teacher.phone
+                    phone: teacher.phone,
+                    
                 });
             }
+            setSkills(teacher.skills)
+            //console.log(form.getFieldsValue())
         }
+        if (modalTitle == "Add Teacher" && data !== undefined) {
+            setSkills([])
+        }
+
 
     }, [isModalVisible]);
 
     const modaleButtonOnClick = () => {
 
         if (modalTitle == "Add Teacher") {
-            console.log("add teacher");
+
             console.log(name, email, area, phone);
             name == undefined ? setName(form.getFieldValue("name")) : null;
             email == undefined ? setEmail(form.getFieldValue("email")) : null;
             area == undefined ? setArea(form.getFieldValue("area")) : null;
             phone == undefined ? setPhone(form.getFieldValue("phone")) : null;
-            console.log("second");
-            console.log(name, email, area, phone);
+            //console.log("second");
+            //console.log(name, email, area, phone);
             if (name != undefined && email != undefined && area != undefined && phone != undefined) {
                 const postResult = postAddTeacherService(
                     {
@@ -136,7 +144,7 @@ const TeacherListPage = () => {
                         email: email,
                         country: area,
                         phone: phone,
-                        skills: []
+                        skills: skills
                     }).then(function (response) {
 
                         if (response.status == true) {
@@ -168,8 +176,10 @@ const TeacherListPage = () => {
                 "name": formTeacherValues.name,
                 "country": formTeacherValues.area,
                 "phone": formTeacherValues.phone,
-                "skills": []
+                "skills": skills
             }
+            console.log("the object when passing from the page");
+            console.log(editedTeacher);
 
             putEditTeacherService(editedTeacher);
             setUpdateTrigger(updateTrigger + 1);
@@ -208,7 +218,7 @@ const TeacherListPage = () => {
         })
         return filter;
     }
-    
+
 
     return (
         <>
@@ -232,10 +242,10 @@ const TeacherListPage = () => {
                     />
                     <Column title="Name" dataIndex="name" key="name"
                         sorter={(a: TeacherListRecord, b: TeacherListRecord) => a.name.length - b.name.length} sortDirections={['descend']}
-                        render={(text, record: TeacherListRecord) =>(
+                        render={(text, record: TeacherListRecord) => (
                             <Link href="/teacher/[id]" as={`/teacher/${record.key}`}>
-                        <a>{record.name}</a>
-                        </Link>
+                                <a>{record.name}</a>
+                            </Link>
                         )}
                     />
                     <Column title="Country" dataIndex="country" key="country"
@@ -333,54 +343,97 @@ const TeacherListPage = () => {
                             setPhone(e.target.value)
                         }} />
                     </Form.Item>
-                    <Form.Item name="skill" label="Skills" >
+                    <Form.Item name="skill" label="New Skill">
+
                         <Row>
                             <Col span={8}>
-                            <Input onChange={e => {
-                            form.setFieldsValue({ skill: e.target.value })
-                            setSkill(e.target.value)
-                        }} />
+                                <Input value={skill} onChange={e => {
+                                    form.setFieldsValue({ skill: e.target.value })
+                                    setSkill(e.target.value)
+                                }} />
                             </Col>
                             <Col span={12} offset={2}>
-                            <Rate allowHalf value={rateValue} onChange={(value) => setRateValue(value)} />
+                                <Rate allowHalf value={rateValue} onChange={(value) => setRateValue(value)} />
                             </Col>
-                            <Col span={2}>
-                            <Button type="primary" shape="circle" icon={<PlusOutlined />} 
-                            onClick={() => {
-                                if (skill !== undefined && rateValue !== undefined) {
-                                    const newSkill : skill = {
-                                        name: skill,
-                                        rate: rateValue
-                                    }
-                                    skills == undefined ? setSkills([newSkill]) : setSkills([
-                                        ...skills,
-                                        newSkill
-                                    ])
-                                }
-                                
-                            }}
-                            />
+                            <Col span={2} style={{ paddingBottom: "10px" }}>
+                                <Button type="primary" shape="circle" icon={<PlusOutlined />}
+                                    onClick={() => {
+                                        if (skill !== undefined && rateValue !== undefined) {
+                                            const newSkill: Skill = {
+                                                name: skill,
+                                                level: rateValue
+                                            }
+                                            skills == undefined ? setSkills([newSkill]) : setSkills([
+                                                ...skills,
+                                                newSkill
+                                            ])
+                                        }
+                                        setSkill('')
+                                        setRateValue(0)
+
+                                    }}
+                                />
                             </Col>
-                        </Row> 
-                        {skills !== undefined ? skills.map((skill,key)=> {
-                            return (<Row key={key} style={{paddingTop: "5px"}}>
-                            <Col span={4} offset={4}>
-                            {skill.name}
-                            </Col>
-                            <Col span={12} offset={2}>
-                            <Rate allowHalf disabled value={skill.rate} />
-                            </Col>
-                            <Col span={2}>
-                            <Button type="primary" shape="circle" icon={<PlusOutlined />} 
-                            onClick={() => {
-                                
-                                
-                            }}
-                            />
-                            </Col>
-                            </Row>)
-                        }): null}                                        
+                        </Row>
                     </Form.Item>
+                    <Form.Item name="skills" label="Skills">
+                    
+                    {skills !== undefined ? skills.map((skill, key) => {
+                        return (
+                            // TODO: inorder to style the descriptions, we should style it later 
+                            // with replacing Descriptions to Rows and Cols
+                            <Descriptions column={{  xs: 3 }} bordered size="small" >
+                                    <Descriptions.Item label={skill.name} >
+                                        <Rate allowHalf value={skill.level} 
+                                        onChange={(value) => {
+                                            //console.log("original skills" + skills)
+                                            console.log(skills)
+                                            const changedSkillItem = {
+                                                name: skill.name,
+                                                level: value
+                                            }
+                                            const changedSkillItemIndex = skills.indexOf(skills.filter(item => item.name == skill.name)[0]);
+                                            const newArrayOfSkills = [...skills]
+                                            newArrayOfSkills[changedSkillItemIndex] = changedSkillItem;
+                                            setSkills(newArrayOfSkills)
+                                            //console.log(skills)
+                                        }}
+                                        
+                                        />
+                                        </Descriptions.Item>
+                                    <Descriptions.Item >
+                                        <a onClick={() => {
+                                            setSkills(skills.filter(item => item.name !== skill.name))
+                                        }}>delete</a>
+                                    </Descriptions.Item>
+                                    </Descriptions>
+                            
+
+                        )
+                    }) : null}
+                    
+                    </Form.Item>
+
+                    {/* <Form.Item name="skills" label="Skills">
+                        {form.getFieldValue("skills") !== undefined ? form.getFieldValue("skills").map((skill: { level: number, name: string }, key: number) => {
+                            return (
+                                <Descriptions bordered size="small" key={key}>
+                                    <Descriptions.Item label={skill.name} ><Rate allowHalf disabled value={skill.level} /></Descriptions.Item>
+                                    <Descriptions.Item >
+                                        <a onClick={() => {
+                                            const rightSetOfSkills = form.getFieldValue("skills").filter((item: { name: string, level: number }) => item.name !== skill.name);
+                                            console.log(rightSetOfSkills)
+                                            form.setFieldsValue({ skills: rightSetOfSkills
+                                            })
+                                        }}>delete</a>
+                                    </Descriptions.Item>
+                                </Descriptions>
+
+
+                            )
+                        }) : null}
+
+                    </Form.Item> */}
 
 
                 </Form>
