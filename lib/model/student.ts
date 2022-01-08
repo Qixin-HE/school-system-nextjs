@@ -1,4 +1,5 @@
 import { Key } from "react";
+import { BriefCourse } from "./course";
 import { ResponsePaginator } from "./response";
 
 export interface StudentListRecord {
@@ -19,7 +20,7 @@ interface StudentType {
 }
 
 
-export interface CourseStudentDetail extends Course {
+export interface CourseStudentDetail extends BriefCourse {
     key: number,
     type: string,
     joinTime: string
@@ -59,7 +60,7 @@ export interface Student {
     country: string,
     profileId: number,
     type: StudentType,
-    courses?: Course[],
+    courses?: BriefCourse[],
 
 }
 
@@ -67,13 +68,13 @@ interface StudentDetailCourseType {
     id: number,
     name: string
 }
-interface Course {
-    id: number,
-    courseId?: number,
-    name: string,
-}
+// interface Course {
+//     id: number,
+//     courseId?: number,
+//     name: string,
+// }
 
-interface StudentDetailCourse extends Course {
+interface StudentDetailCourse extends BriefCourse {
     courseDate: string,
     createdAt: string,
     studentId: number,

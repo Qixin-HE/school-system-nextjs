@@ -13,7 +13,7 @@ import {
     MenuFoldOutlined,
     BellOutlined
 } from '@ant-design/icons';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link'
 import React from 'react';
 import { logOutService } from '../lib/api/studentService';
@@ -118,7 +118,7 @@ const Dashboard = ({ children }: any) => {
                             </SubMenu>
                             <SubMenu key="sub3" icon={<ReadOutlined />} title="Course">
                                 <Menu.Item key="5" icon={<ProjectOutlined />}>
-                                    <Link href="/AllCoursePage">
+                                    <Link href="/allcourse">
                                         All Course
                                     </Link>
                                 </Menu.Item>
