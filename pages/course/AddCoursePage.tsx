@@ -1,13 +1,13 @@
-import Dashboard from "../components/Dashboard";
+import Dashboard from "../../components/Dashboard";
 import Link from 'next/link'
 
-const EditCoursePage = () => {
+const AddCoursePage = () => {
 
     return (
         <>
             <Dashboard>
                 <div>
-                    <h1>This is the Edit course page.</h1>
+                    <h1>This is the Add course page.</h1>
 
                     <h1>
                         Go{' '}back{' '}
@@ -21,4 +21,4 @@ const EditCoursePage = () => {
     )
 }
 
-export default EditCoursePage;
+export default AddCoursePage;

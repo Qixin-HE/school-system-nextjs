@@ -3,11 +3,15 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import Link from 'next/link'
 import { Layout } from 'antd';
+import React from 'react';
 
 const { Header, Footer, Content } = Layout;
 
 const Home: NextPage = () => {
-
+  //fix the warning of useLayoutEffect
+  if (typeof document === 'undefined') {
+    React.useLayoutEffect = React.useEffect;
+  }
   return (
     <div className={styles.container}>
       <Head>
