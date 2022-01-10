@@ -11,12 +11,17 @@ Course information display:
 Work Items:
 All course display:
 (allcourse.tsx)
-    a. create card component
-    one card display for one course on the allcourse page
-    b. import the card component 
-    pass the course information to the card component and display it on the page
-    c. set up grid on the page
-    make the cards auto scale on the page using grid
+    a. make use of antd list component to display course list
+    b. implement cards in the list and style the card
+Course api:
+(api/courseService.ts)
+    a. get, add, edit, delete course service using axios api service
+Course type:
+(lib/model/course.ts)
+    a. move Course from student.ts
+    b. type the course response from api get call
+
+    
 
 a. create card component : 
 1)create components/CourseCard.tsx 

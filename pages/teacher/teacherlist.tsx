@@ -414,26 +414,7 @@ const TeacherListPage = () => {
                     
                     </Form.Item>
 
-                    {/* <Form.Item name="skills" label="Skills">
-                        {form.getFieldValue("skills") !== undefined ? form.getFieldValue("skills").map((skill: { level: number, name: string }, key: number) => {
-                            return (
-                                <Descriptions bordered size="small" key={key}>
-                                    <Descriptions.Item label={skill.name} ><Rate allowHalf disabled value={skill.level} /></Descriptions.Item>
-                                    <Descriptions.Item >
-                                        <a onClick={() => {
-                                            const rightSetOfSkills = form.getFieldValue("skills").filter((item: { name: string, level: number }) => item.name !== skill.name);
-                                            console.log(rightSetOfSkills)
-                                            form.setFieldsValue({ skills: rightSetOfSkills
-                                            })
-                                        }}>delete</a>
-                                    </Descriptions.Item>
-                                </Descriptions>
-
-
-                            )
-                        }) : null}
-
-                    </Form.Item> */}
+                    
 
 
                 </Form>
