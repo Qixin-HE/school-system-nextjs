@@ -33,7 +33,7 @@ export const getTeacherListService = async (page?: number, limit?: number, query
                 name: e.name,
                 country: e.country,
                 email: e.email,
-                skills: e.skills,
+                skills: e.skills!,
                 courseAmount: e.courseAmount,
                 phone: e.phone
             }

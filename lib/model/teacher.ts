@@ -39,7 +39,8 @@ export interface Teacher {
     email: string,
     name: string,
     phone: string,
-    skills: Skill[]
+    skills?: Skill[]
+    profileId?:number //for course.ts - model to use in course detail
 }
 export interface getTeacherDetailResponse extends Teacher{
 profileId:number,

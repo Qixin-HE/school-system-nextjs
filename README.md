@@ -6,7 +6,7 @@
 //
 Features:
 Course information display:
-- Display all course in a Grid
+- Display all course in an antd List
 
 Work Items:
 All course display:
@@ -16,15 +16,19 @@ All course display:
 Course api:
 (api/courseService.ts)
     a. get, add, edit, delete course service using axios api service
+    b. implement the getACourseByIdService() for the course detail page - course/[id].tsx
 Course type:
 (lib/model/course.ts)
     a. move Course from student.ts
     b. type the course response from api get call
+    c. type the course detail response and make use of the exsiting type (Teacher from model/teacher.ts and getCourseResponse in the same file)
+Course detail display:
+(course/[id].tsx)
+    a. make use of the type response and arrange the information display
+
 
     
 
-a. create card component : 
-1)create components/CourseCard.tsx 
 
 //
 Features:

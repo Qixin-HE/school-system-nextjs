@@ -144,14 +144,14 @@ export const putEditStudentService = async (data: editPutStudent): Promise<any> 
 
 
 export const getAStudentByIDService = async(id:string): Promise<any> => {
-    let rows: StudentListRecord[] = [];
+    
     let value: getStudentResponse;
 
     return await getService(`students/${id}`).then(function (response: AxiosResponse) {
         value = response.data.data;
         
         
-        //console.log(value)
+        
 
     }).catch(function (error) {
         // handle error
