@@ -382,7 +382,7 @@ const TeacherListPage = () => {
                         return (
                             // TODO: inorder to style the descriptions, we should style it later 
                             // with replacing Descriptions to Rows and Cols
-                            <Descriptions column={{  xs: 3 }} bordered size="small" >
+                            <Descriptions column={{  xs: 3 }} bordered size="small" key={key}>
                                     <Descriptions.Item label={skill.name} >
                                         <Rate allowHalf value={skill.level} 
                                         onChange={(value) => {

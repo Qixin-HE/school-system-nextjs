@@ -1,4 +1,18 @@
-问题：
+Features:
+Individual course details display:
+- Display all details of a course in a page
+
+Course detail display:
+(course/[id].tsx)
+    a. make use of the type response and arrange the information display
+    b. make use of the student/[id].tsx page to re-arrange it for course detail page
+    have to change the Breadcrumb href as well
+    c. understand the relation of status and chapters
+    d. create status part
+    set an apporiate icon and map through the data then return it
+
+//
+已解决问题：
 1. (solved) style the skills sections on teacher add and edit => todo: change it to rows and cols
 2. skills and rateValue not destroy when modal close (have to set it manually when onClose) 
     - maybe related to form item
@@ -22,12 +36,6 @@ Course type:
     a. move Course from student.ts
     b. type the course response from api get call
     c. type the course detail response and make use of the exsiting type (Teacher from model/teacher.ts and getCourseResponse in the same file)
-Course detail display:
-(course/[id].tsx)
-    a. make use of the type response and arrange the information display
-
-
-    
 
 
 //
