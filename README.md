@@ -1,5 +1,6 @@
 问题：
 1.course/[id].tsx 没办法把steps换行 （现在它太长了穿过了当前row和col）
+2. when refresh, status not displaying correctly, but after making modification on the file and saving it, the status is correct - 貌似无法复现
 
 //
 Features:

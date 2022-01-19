@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import {
     Tag, Breadcrumb, Table, TablePaginationConfig, Modal,
     Form, Card, Tabs, Layout,
-    Row, Col, Avatar, Image, Button, Divider, Typography, Steps, Badge, Descriptions
+    Row, Col, Avatar, Image, Button, Divider, Typography, Steps, Badge, Descriptions, Collapse
 } from 'antd';
 import Link from 'next/link';
 import { getACourseByIdService } from '../../lib/api/courseService';
@@ -12,6 +12,10 @@ import { HeartFilled, UserOutlined } from '@ant-design/icons';
 import Title from 'antd/lib/typography/Title';
 import { CheckCircleOutlined } from '@ant-design/icons';
 
+interface Status {
+    status: string
+    currentIndex: number
+}
 
 const CourseDetailPage = () => {
     const router = useRouter()
@@ -19,10 +23,9 @@ const CourseDetailPage = () => {
     const { id } = router.query
 
     const [data, setData] = useState<CourseDetail>();
-    const [status, setStatus] = useState({
+    const [status, setStatus] = useState<Status>({
         status: "",
-        currentIndex: 999
-
+        currentIndex: 999,
     })
 
 
@@ -30,27 +33,60 @@ const CourseDetailPage = () => {
         if (id !== undefined) {
             getACourseByIdService(id.toString()).then(function (result) {
                 setData(result);
-
                 console.log(result);
-                if (data?.status === 0) {
-                    status.status = "warning";
-                    setStatus(status)
-                } else if (data?.status === 1) {
-                    status.status = "success"
-                    setStatus(status)
-                } else {
-                    status.status = "default"
-                    setStatus(status)
-                }
-                status.currentIndex = data?.schedule.chapters.indexOf(data?.schedule.chapters.filter(item => item.id == data.schedule.current)[0]) || 999
-
-
+                // if(data !== undefined){
+                    // if (data.status === 0) {
+                        
+                    //     setStatus({...status, status : "warning"})
+                    // } else if (data.status === 1) {
+                        
+                    //     setStatus({...status, status : "success"})
+                    // } else {
+                        
+                    //     setStatus({...status, status : "default"})
+                        
+                    // }
+                    // const currentChapter = data.schedule.chapters.find(item => item.id == data.schedule.current)
+                    // if (currentChapter!== undefined){
+                    //     status.currentIndex = data.schedule.chapters.indexOf(currentChapter)
+                    //     setStatus(status)
+                    // }
+                    
+    
+                
+                //}
 
             });
-
         }
 
-    }, []); //it was "router" as the trigger before
+    }, [router]); //it was "router" as the trigger before
+
+    useEffect(() => {
+        console.log("second useEffect triggered!")
+        
+        if(data !== undefined){
+        if (data.status === 0) {
+                        
+            setStatus({...status, status : "warning"})
+        } else if (data.status === 1) {
+            
+            setStatus({...status, status : "success"})
+        } else {
+            
+            setStatus({...status, status : "default"})
+            
+        }
+        const currentChapter = data.schedule.chapters.find(item => item.id == data.schedule.current)
+        if (currentChapter!== undefined){
+            
+            setStatus({...status, currentIndex : data.schedule.chapters.indexOf(currentChapter)})
+        }
+        console.log(status)
+    }
+                
+        
+
+    }, [data]); //it was "router" as the trigger before
 
 
 
@@ -70,7 +106,7 @@ const CourseDetailPage = () => {
 
     //for the <Description> tag
     const generateClassTime = (day: string) => {
-        if (data !== undefined) {
+        if (data !== undefined && data.schedule.classTime !== null) {
             const newClassTimeArray = data.schedule.classTime.map(item => {
                 const newItem = {
                     "day": item.split(" ")[0],
@@ -79,25 +115,29 @@ const CourseDetailPage = () => {
                 return newItem
             })
             const foundDay = newClassTimeArray.find(item => item.day === day)
-            console.log("what foundDay is now")
-            console.log(foundDay)
-
             if (day === foundDay?.day) {
-                console.log("found a day")
-
-
                 return foundDay.time
             }
         }
-        console.log("did not found a day")
-        console.log(day)
         return ""
+    }
+    const { Panel } = Collapse;
+    // for the <tag> on Panel
+    const getPanelExtra = (chapterId:number) =>{
+        if(data !== undefined) {
+            if(chapterId > data.schedule.current){
+                return <Tag color="warning">pending</Tag>
+            }else if (chapterId === data.schedule.current){
+                return <Tag color="success">processing</Tag>
+            }else {
+                return <Tag color="default">finished</Tag>
+            }
+        }
     }
 
 
+
     return (
-
-
         <>
 
             <Layout>
@@ -160,9 +200,7 @@ const CourseDetailPage = () => {
                                                 </Col>
                                                 <Col style={{ marginLeft: "auto" }}>
                                                     <strong>{data.maxStudents}</strong>
-
                                                 </Col>
-
                                             </Row>
                                         </div>
                                     </div>
@@ -234,43 +272,31 @@ const CourseDetailPage = () => {
                                     <p>{data.uid}</p>
                                     <Title level={5}>Class Time</Title>
                                     <Descriptions layout="vertical" bordered column={7}>
-                                        {/* <Descriptions.Item label="Sunday" >{data.schedule.classTime}</Descriptions.Item>
-                                        <Descriptions.Item label="Monday">Prepaid</Descriptions.Item>
-                                        <Descriptions.Item label="Tuesday">YES</Descriptions.Item>
-                                        <Descriptions.Item label="Wednesday">YES</Descriptions.Item>
-                                        <Descriptions.Item label="Thursday">YES</Descriptions.Item>
-                                        <Descriptions.Item label="Friday">YES</Descriptions.Item>
-                                        <Descriptions.Item label="Saturday">YES</Descriptions.Item> */}
+
                                         {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((item, key) =>
                                             <Descriptions.Item label={item} key={key}>{generateClassTime(item)}</Descriptions.Item>)}
                                     </Descriptions>
+                                    <Title level={5}>Category</Title>
+                                    <Tag color="blue">{data.type[0].name}</Tag>
+                                    <Title level={5} style={{ paddingTop: "10px", paddingBottom: "10px" }}>Description</Title>
+                                    <p>{data.detail}</p>
+                                    <Title level={5} style={{ paddingTop: "10px" }}>Chapter</Title>
+                                    <Collapse
+                                        defaultActiveKey={['1']}
+                                        
+                                        expandIconPosition="left"
+                                    >{
+                                        data.schedule.chapters.map((item, key) => {
+                                            return <Panel header={item.name} key={key} extra={getPanelExtra(item.id)}>
+                                            <div>{item.content}</div>
+                                        </Panel>
+                                        })
+                                    }
+                                        
+                                        
+                                    </Collapse>
 
-
-                                    <Row gutter={[16, 24]}>
-                                        <Col className="gutter-row" span={4}>
-                                            <strong>Educations:</strong>
-                                            <br /><br />
-                                            <strong>Area:</strong>
-                                            <br /><br />
-                                            <strong>Gender:</strong>
-                                            <br /><br />
-                                            <strong>Member Period:</strong>
-                                            <br /><br />
-                                            <strong>Type:</strong><br /><br />
-
-                                            <strong>Update Time:</strong><br /><br />
-
-                                        </Col>
-
-                                    </Row>
-                                    <Row><Col>
-
-                                    </Col>
-                                    </Row>
-                                    <Row><Col>
-
-                                    </Col>
-                                    </Row>
+                                    
 
 
 
