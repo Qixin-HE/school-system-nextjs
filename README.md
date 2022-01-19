@@ -1,3 +1,7 @@
+问题：
+1.course/[id].tsx 没办法把steps换行 （现在它太长了穿过了当前row和col）
+
+//
 Features:
 Individual course details display:
 - Display all details of a course in a page

@@ -160,14 +160,14 @@ const StudentDetailPage = () => {
 
 
                       </Col></Row>
-                      {data.skills.map((skill, key) => {
+                      {data.skills !== undefined? data.skills.map((skill, key) => {
 
                         return <Row key={key} gutter={[16, 24]}>
                           <Col className="gutter-row" span={4}><strong>{skill.name}:</strong></Col>
                           <Col className="gutter-row" span={8}><Rate disabled allowHalf defaultValue={skill.level} /></Col>
                         </Row>
 
-                      })}
+                      }) : null}
 
                       <Row><Col><br /><h1 style={{ color: "blueviolet" }}>Description</h1><br />
                         <p>{data.profile.description}</p>

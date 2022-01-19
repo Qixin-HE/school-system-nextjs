@@ -28,4 +28,6 @@ a {
   font-display: swap;
   src: local('BebasNeue-Regular'), url(/fonts/BebasNeue-Regular.ttf) format('truetype');
 }
-  
+.ant-steps-item > .ant-steps-item-container > .ant-steps-item-content > .ant-steps-item-title::after {
+  background: transparent !important;
+}

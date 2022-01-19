@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import {
     Tag, Breadcrumb, Table, TablePaginationConfig, Modal,
     Form, Card, Tabs, Layout,
-    Row, Col, Avatar, Image, Button, Divider, Typography, Descriptions, Badge
+    Row, Col, Avatar, Image, Button, Divider, Typography, Steps, Badge, Descriptions
 } from 'antd';
 import Link from 'next/link';
 import { getACourseByIdService } from '../../lib/api/courseService';
@@ -22,7 +22,7 @@ const CourseDetailPage = () => {
     const [status, setStatus] = useState({
         status: "",
         currentIndex: 999
-    
+
     })
 
 
@@ -32,25 +32,25 @@ const CourseDetailPage = () => {
                 setData(result);
 
                 console.log(result);
-                if(data?.status === 0){
+                if (data?.status === 0) {
                     status.status = "warning";
                     setStatus(status)
-                }else if (data?.status === 1){
+                } else if (data?.status === 1) {
                     status.status = "success"
                     setStatus(status)
-                }else {
+                } else {
                     status.status = "default"
                     setStatus(status)
                 }
                 status.currentIndex = data?.schedule.chapters.indexOf(data?.schedule.chapters.filter(item => item.id == data.schedule.current)[0]) || 999
 
-                
+
 
             });
-            
+
         }
 
-    }, [router]);
+    }, []); //it was "router" as the trigger before
 
 
 
@@ -66,6 +66,34 @@ const CourseDetailPage = () => {
         width: '25%',
         textAlign: 'center',
     };
+    const { Step } = Steps;
+
+    //for the <Description> tag
+    const generateClassTime = (day: string) => {
+        if (data !== undefined) {
+            const newClassTimeArray = data.schedule.classTime.map(item => {
+                const newItem = {
+                    "day": item.split(" ")[0],
+                    "time": item.split(" ")[1]
+                }
+                return newItem
+            })
+            const foundDay = newClassTimeArray.find(item => item.day === day)
+            console.log("what foundDay is now")
+            console.log(foundDay)
+
+            if (day === foundDay?.day) {
+                console.log("found a day")
+
+
+                return foundDay.time
+            }
+        }
+        console.log("did not found a day")
+        console.log(day)
+        return ""
+    }
+
 
     return (
 
@@ -175,28 +203,49 @@ const CourseDetailPage = () => {
                                     <p>{data.createdAt}</p>
                                     <Title level={5}>Start Time</Title>
                                     <p>{data.startTime}</p>
-                                    <Title level={5}>Status<Badge dot 
-                                    status={status.status as  "default" | "success" | "warning" | "processing" | "error" | undefined}
-                                    style={{top:"-8px", left:"2px"}}
+                                    <Title level={5}>Status<Badge dot
+                                        status={status.status as "default" | "success" | "warning" | "processing" | "error" | undefined}
+                                        style={{ top: "-8px", left: "2px" }}
                                     /></Title>
-                                    <Row gutter={16}>
-                                        {data.schedule.chapters.map((chapter, key)=>{
-                                            
-                                            if(data.schedule.chapters.indexOf(chapter) > status.currentIndex){
-                                                return <Col key={key} className="gutter-row" span={3}>
-                                                <CheckCircleOutlined style={{ fontSize: '25px', color: 'deepskyblue' }}/> {chapter.name}</Col>
-                                        }else if (data.schedule.chapters.indexOf(chapter) == status.currentIndex){
-                                            return <Col key={key} className="gutter-row" span={3}>
-                                                <Badge count={status.currentIndex} style={{ backgroundColor: '#fff', color: 'deepskyblue', boxShadow: '0 0 0 1px #d9d9d9 inset' }} />{chapter.name}</Col>
-                                        }else return null
+                                    <Row style={{ paddingBottom: "10px" }}>
+                                        <Col>
+                                            <Steps current={status.currentIndex} style={{}}>
 
-                                    }
-                                        )
-                                }
-                                            
-                                        </Row>
-                                    
-                                    {/* //todo:add colors to badge : yellow = 0, green = 1, grey = status2 */}
+
+
+
+                                                {data.schedule.chapters.map((chapter, key) => {
+                                                    console.log(status.currentIndex)
+                                                    return <Step key={key} title={chapter.name} style={{ paddingRight: "100px", background: "transparent !important" }} />
+                                                }
+
+
+
+
+                                                )}
+
+
+
+
+                                            </Steps>
+                                        </Col>
+                                    </Row>
+                                    <Title level={5}>Course Code</Title>
+                                    <p>{data.uid}</p>
+                                    <Title level={5}>Class Time</Title>
+                                    <Descriptions layout="vertical" bordered column={7}>
+                                        {/* <Descriptions.Item label="Sunday" >{data.schedule.classTime}</Descriptions.Item>
+                                        <Descriptions.Item label="Monday">Prepaid</Descriptions.Item>
+                                        <Descriptions.Item label="Tuesday">YES</Descriptions.Item>
+                                        <Descriptions.Item label="Wednesday">YES</Descriptions.Item>
+                                        <Descriptions.Item label="Thursday">YES</Descriptions.Item>
+                                        <Descriptions.Item label="Friday">YES</Descriptions.Item>
+                                        <Descriptions.Item label="Saturday">YES</Descriptions.Item> */}
+                                        {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((item, key) =>
+                                            <Descriptions.Item label={item} key={key}>{generateClassTime(item)}</Descriptions.Item>)}
+                                    </Descriptions>
+
+
                                     <Row gutter={[16, 24]}>
                                         <Col className="gutter-row" span={4}>
                                             <strong>Educations:</strong>
