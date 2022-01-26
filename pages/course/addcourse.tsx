@@ -1,12 +1,14 @@
 import Dashboard from "../../components/Dashboard";
 import Link from 'next/link'
-import { Breadcrumb, Button, Col, Form, Input, Layout, Row, Steps } from "antd";
+import { Breadcrumb, Button, Col, DatePicker, Form, Input, Layout, Row, Select, Steps } from "antd";
 import { useState } from "react";
+import TextArea from "antd/lib/input/TextArea";
 
 const AddCoursePage = () => {
     const { Header, Footer, Sider, Content } = Layout;
     const { Step } = Steps;
     const [form] = Form.useForm();
+    const { Option } = Select;
 
     const [stepCurrent, setStepCurrent] = useState(0);
 
@@ -30,40 +32,75 @@ const AddCoursePage = () => {
                     form={form}
 
                 >
-                    <Row style={{paddingTop: "20px"}}>
-                        <Col xs={{ span: 5 }}>
+                    <Row style={{ paddingTop: "20px" }}>
+                        <Col flex={2} style={{ paddingRight: "20px" }}>
                             <Form.Item label="Course Name" name="name" required>
-                            <Input placeholder="course name" />
+                                <Input placeholder="course name" />
                             </Form.Item>
                         </Col>
-                        <Col xs={{ span: 5, offset: 1 }}>
+                        <Col xs={{ span: 5 }} style={{ paddingRight: "20px" }}>
                             <Form.Item label="Teacher" name="teacher" required>
-                            <Input placeholder="course name" />
+                                <Input placeholder="course name" />
                             </Form.Item>
                         </Col>
-                        <Col xs={{ span: 5, offset: 1 }}>
+                        <Col xs={{ span: 5 }} style={{ paddingRight: "20px" }}>
                             <Form.Item label="Type" name="type" required>
-                            <Input  />
+                                <Input />
                             </Form.Item>
                         </Col>
-                        <Col xs={{ span: 5, offset: 1 }}>
+                        <Col xs={{ span: 5 }}>
                             <Form.Item label="Course Code" name="code" required>
-                            <Input  />
+                                <Input />
                             </Form.Item>
                         </Col>
 
                     </Row>
+                    <Row>
+                        <Col flex={2} style={{ paddingRight: "20px" }}>
+                            <Form.Item label="Start Date" name="startDate">
+                                <DatePicker style={{ width: '50%' }} />
+                            </Form.Item>
 
+                            <Form.Item label="Price" name="price" required>
+                                <Input prefix="$" style={{ width: '50%' }} />
+                            </Form.Item>
+                            <Form.Item label="Student Limit" name="studentLimit" required>
+                                <Input style={{ width: '50%' }} />
+                            </Form.Item>
+                            <Form.Item label="Duration" name="duration" required>
+                                <Input.Group compact>
+                                    <Input style={{ width: '50%' }} />
+                                    <Select defaultValue="Zhejiang">
+                                        <Option value="Zhejiang">Zhejiang</Option>
+                                        <Option value="Jiangsu">Jiangsu</Option>
+                                    </Select>
 
-                    <Form.Item label="teacher">
-                        <Input placeholder="input placeholder" />
-                    </Form.Item>
-                    <Form.Item label="type">
-                        <Input placeholder="input placeholder" />
-                    </Form.Item>
-                    <Form.Item>
-                        <Button type="primary">Submit</Button>
-                    </Form.Item>
+                                </Input.Group>
+                            </Form.Item>
+                        </Col>
+                        <Col flex={2} style={{ paddingRight: "20px" }}>
+                            <Form.Item label="Student Limit" name="studentLimit" required>
+                                <TextArea
+                                    placeholder="Controlled autosize"
+                                    style={{ height: "300px" }}
+                                />
+                            </Form.Item>
+
+                        </Col>
+                        <Col flex={2}>
+                            <Form.Item label="Cover" name="cover" required>
+                                <TextArea
+
+                                    placeholder="Controlled autosize"
+                                    style={{ height: "300px" }}
+                                />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+                    <Button type="primary" htmlType="submit">
+                        Submit
+                    </Button>
                 </Form>
 
             </>
@@ -85,7 +122,7 @@ const AddCoursePage = () => {
 
                         </Breadcrumb>
 
-                        <div className="space-align-block" style={{ backgroundColor: "white", padding: "25px", paddingLeft: "35px"}}>
+                        <div className="space-align-block" style={{ backgroundColor: "white", padding: "25px", paddingLeft: "35px", paddingRight: "35px" }}>
                             <Steps
                                 type="navigation"
                                 current={stepCurrent}
