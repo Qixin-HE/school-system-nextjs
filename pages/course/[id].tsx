@@ -7,13 +7,13 @@ import {
 } from 'antd';
 import Link from 'next/link';
 import { getACourseByIdService } from '../../lib/api/courseService';
-import { CourseDetail } from '../../lib/model/course';
+import { Chapter, CourseDetail } from '../../lib/model/course';
 import { HeartFilled, UserOutlined } from '@ant-design/icons';
 import Title from 'antd/lib/typography/Title';
 import { CheckCircleOutlined } from '@ant-design/icons';
 
 interface Status {
-    status: string
+    statusStr: string
     currentIndex: number
 }
 
@@ -24,7 +24,7 @@ const CourseDetailPage = () => {
 
     const [data, setData] = useState<CourseDetail>();
     const [status, setStatus] = useState<Status>({
-        status: "",
+        statusStr: "",
         currentIndex: 999,
     })
 
@@ -34,59 +34,31 @@ const CourseDetailPage = () => {
             getACourseByIdService(id.toString()).then(function (result) {
                 setData(result);
                 console.log(result);
-                // if(data !== undefined){
-                    // if (data.status === 0) {
-                        
-                    //     setStatus({...status, status : "warning"})
-                    // } else if (data.status === 1) {
-                        
-                    //     setStatus({...status, status : "success"})
-                    // } else {
-                        
-                    //     setStatus({...status, status : "default"})
-                        
-                    // }
-                    // const currentChapter = data.schedule.chapters.find(item => item.id == data.schedule.current)
-                    // if (currentChapter!== undefined){
-                    //     status.currentIndex = data.schedule.chapters.indexOf(currentChapter)
-                    //     setStatus(status)
-                    // }
+                let status;
+                if (result.status === 0) {
                     
+                    status = "warning";
+                } else if (result.status === 1) {
+                    status = "success";
+                    
+                } else {
+                    status = "default";
+                    
+                }
+                const currentChapter = result.schedule.chapters.find((chapter : Chapter) => chapter.id == result.schedule.current)
+                if (currentChapter !== undefined) {
     
-                
-                //}
+                    setStatus({ 
+                        statusStr: status, 
+                        currentIndex: result.schedule.chapters.indexOf(currentChapter) })
+                }
+                //console.log(status)
 
             });
         }
 
     }, [router]); //it was "router" as the trigger before
 
-    useEffect(() => {
-        console.log("second useEffect triggered!")
-        
-        if(data !== undefined){
-        if (data.status === 0) {
-                        
-            setStatus({...status, status : "warning"})
-        } else if (data.status === 1) {
-            
-            setStatus({...status, status : "success"})
-        } else {
-            
-            setStatus({...status, status : "default"})
-            
-        }
-        const currentChapter = data.schedule.chapters.find(item => item.id == data.schedule.current)
-        if (currentChapter!== undefined){
-            
-            setStatus({...status, currentIndex : data.schedule.chapters.indexOf(currentChapter)})
-        }
-        console.log(status)
-    }
-                
-        
-
-    }, [data]); //it was "router" as the trigger before
 
 
 
@@ -123,19 +95,17 @@ const CourseDetailPage = () => {
     }
     const { Panel } = Collapse;
     // for the <tag> on Panel
-    const getPanelExtra = (chapterId:number) =>{
-        if(data !== undefined) {
-            if(chapterId > data.schedule.current){
+    const getPanelExtra = (chapterId: number) => {
+        if (data !== undefined) {
+            if (chapterId > data.schedule.current) {
                 return <Tag color="warning">pending</Tag>
-            }else if (chapterId === data.schedule.current){
+            } else if (chapterId === data.schedule.current) {
                 return <Tag color="success">processing</Tag>
-            }else {
+            } else {
                 return <Tag color="default">finished</Tag>
             }
         }
     }
-
-
 
     return (
         <>
@@ -242,30 +212,33 @@ const CourseDetailPage = () => {
                                     <Title level={5}>Start Time</Title>
                                     <p>{data.startTime}</p>
                                     <Title level={5}>Status<Badge dot
-                                        status={status.status as "default" | "success" | "warning" | "processing" | "error" | undefined}
+                                        status={status.statusStr as "default" | "success" | "warning" | "processing" | "error" | undefined}
                                         style={{ top: "-8px", left: "2px" }}
                                     /></Title>
                                     <Row style={{ paddingBottom: "10px" }}>
-                                        <Col>
-                                            <Steps current={status.currentIndex} style={{}}>
+                                        <Col style={{ overflowX : "scroll"}}>
+                                            {/* {status.currentIndex !== 999 ?  */}
+                                                <Steps current={status.currentIndex} >
 
 
 
 
-                                                {data.schedule.chapters.map((chapter, key) => {
-                                                    console.log(status.currentIndex)
-                                                    return <Step key={key} title={chapter.name} style={{ paddingRight: "100px", background: "transparent !important" }} />
-                                                }
+                                                    {data.schedule.chapters.map((chapter, key) => {
+                                                        // console.log("stpe")
+                                                        // console.log(status.currentIndex)
+                                                        return <Step key={key} title={chapter.name} style={{ paddingRight: "100px", background: "transparent !important" }} />
+                                                    }
 
 
 
 
-                                                )}
+                                                    )}
 
 
 
 
-                                            </Steps>
+                                                </Steps>
+                                            {/* : null} */}
                                         </Col>
                                     </Row>
                                     <Title level={5}>Course Code</Title>
@@ -283,20 +256,22 @@ const CourseDetailPage = () => {
                                     <Title level={5} style={{ paddingTop: "10px" }}>Chapter</Title>
                                     <Collapse
                                         defaultActiveKey={['1']}
-                                        
+
                                         expandIconPosition="left"
                                     >{
-                                        data.schedule.chapters.map((item, key) => {
-                                            return <Panel header={item.name} key={key} extra={getPanelExtra(item.id)}>
-                                            <div>{item.content}</div>
-                                        </Panel>
-                                        })
-                                    }
-                                        
-                                        
+                                            data.schedule.chapters.map((item, key) => {
+                                                // console.log("panel")
+                                                // console.log(status.currentIndex)
+                                                return <Panel header={item.name} key={key} extra={getPanelExtra(item.id)}>
+                                                    <div>{item.content}</div>
+                                                </Panel>
+                                            })
+                                        }
+
+
                                     </Collapse>
 
-                                    
+
 
 
 

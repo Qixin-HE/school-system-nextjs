@@ -118,17 +118,17 @@ const Dashboard = ({ children }: any) => {
                             </SubMenu>
                             <SubMenu key="sub3" icon={<ReadOutlined />} title="Course">
                                 <Menu.Item key="5" icon={<ProjectOutlined />}>
-                                    <Link href="/allcourse">
+                                    <Link href="/course/allcourse">
                                         All Course
                                     </Link>
                                 </Menu.Item>
                                 <Menu.Item key="6" icon={<PlusSquareOutlined />}>
-                                    <Link href="/AddCoursePage">
+                                    <Link href="/course/addcourse">
                                         Add Course
                                     </Link>
                                 </Menu.Item>
                                 <Menu.Item key="7" icon={<EditOutlined />}>
-                                    <Link href="/EditCoursePage">
+                                    <Link href="/course/editcourse">
                                         Edit Course
                                     </Link>
                                 </Menu.Item>

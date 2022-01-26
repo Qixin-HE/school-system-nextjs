@@ -44,7 +44,7 @@ interface Schedule {
     chapters: Chapter[]
 }
 
-interface Chapter {
+export interface Chapter {
     createdAt: string,
     updatedAt: string,
     id: number,
