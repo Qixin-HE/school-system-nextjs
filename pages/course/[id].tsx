@@ -216,7 +216,7 @@ const CourseDetailPage = () => {
                                         style={{ top: "-8px", left: "2px" }}
                                     /></Title>
                                     <Row style={{ paddingBottom: "10px" }}>
-                                        <Col style={{ overflowX : "scroll"}}>
+                                        <Col className="frame" style={{ overflowX : "auto", height:"10vh"}}>
                                             {/* {status.currentIndex !== 999 ?  */}
                                                 <Steps current={status.currentIndex} >
 

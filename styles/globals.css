@@ -31,3 +31,13 @@ a {
 .ant-steps-item > .ant-steps-item-container > .ant-steps-item-content > .ant-steps-item-title::after {
   background: transparent !important;
 }
+
+
+.frame::-webkit-scrollbar {
+  -webkit-appearance: none;
+}
+.frame::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  border: 4px solid white; /* should match background, can't be transparent */
+  background-color: rgba(0, 0, 0, .5);
+}
