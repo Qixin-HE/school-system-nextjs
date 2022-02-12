@@ -3,6 +3,8 @@ add a new course
 
 (course/addcourse.tsx)
     a. make use of antd library and the course type, create required input fields for adding a course
+    b. set up api service for adding a new course
+    c. Create function to get course types
 
 Work Item:
     add course ui:
@@ -22,6 +24,8 @@ Work Item:
     api/courseService.ts
 
     c. postCourseService()
+    d. getCourseTypes()
+    
 //
 Features:
 Individual course details display:

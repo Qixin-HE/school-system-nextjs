@@ -5,7 +5,7 @@ export interface BriefCourse {
     courseId?: number,
     name: string,
 }
-interface CourseType {
+export interface CourseType {
     id: number,
     name: string
 }

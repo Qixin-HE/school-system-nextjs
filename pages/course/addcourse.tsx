@@ -1,10 +1,15 @@
 import Dashboard from "../../components/Dashboard";
 import Link from 'next/link'
-import { Breadcrumb, Button, Col, DatePicker, Form, Input, Layout, Row, Select, Space, Steps } from "antd";
-import { useState } from "react";
+import { Breadcrumb, Button, Col, DatePicker, Divider, Form, Input, InputNumber, Layout, Row, Select, Space, Steps } from "antd";
+import { useEffect, useState } from "react";
 import TextArea from "antd/lib/input/TextArea";
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import Title from "antd/lib/typography/Title";
+import { v4 as uuidv4 } from 'uuid';
+import { getTeacherListService } from "../../lib/api/teacherService";
+import { getCourseTypes } from "../../lib/api/courseService";
+import { CourseType } from "../../lib/model/course";
+import { checkPrimeSync } from "crypto";
+import moment from "moment";
 
 const AddCoursePage = () => {
     const { Header, Footer, Sider, Content } = Layout;
@@ -13,6 +18,45 @@ const AddCoursePage = () => {
     const { Option } = Select;
 
     const [stepCurrent, setStepCurrent] = useState(0);
+    const [teachers, setTeachers] = useState<{ id: number, name: string }[]>();
+    const [queryParams, setQueryParams] = useState({
+        page: 1,
+        limit: 10
+    })
+    const [totalPage, setTotalPage] = useState(0);
+    const [courseType, setCourseType] = useState<CourseType[]>()
+    const [courseCode, setCourseCode] = useState<string>();
+    
+
+
+
+    useEffect(() => {
+        getTeacherListService(queryParams.page, queryParams.limit).then((result) => {
+            let teacherRecordShortList: { id: number, name: string }[] = [];
+            result.data.forEach((teacher: { id: number, name: string }) => {
+                const techerRecordShort = {
+                    id: teacher.id,
+                    name: teacher.name
+                }
+                teacherRecordShortList.push(techerRecordShort)
+            })
+            setTeachers(teacherRecordShortList);
+            setTotalPage(Math.round(result.total / 10))
+            getCourseTypes().then((result) =>{
+                setCourseType(result)
+                
+            }
+                )
+            setCourseCode(uuidv4());
+
+
+        })
+
+    }, [queryParams]);
+    // useEffect(()=>{
+    //     setStartDate(`${startDate} 00:00:00`)
+
+    // },[startDate])
 
     const stepStatus = (stepIndex: number) => {
         if (stepIndex < stepCurrent) {
@@ -24,6 +68,16 @@ const AddCoursePage = () => {
         }
 
     }
+
+    // const getStartDate = (dateString : string) => {
+    //     const date = dateString;
+    //     setStartDatetime(`${date} 00:00:00`)
+    //     console.log("start date is")
+    //     console.log(startDatetime)
+    //     // form.setFieldsValue({startDate: ''})
+    //     // form.setFieldsValue({startDate: startDatetime})
+    // }
+
     const chapters = {
         Beijing: ['Tiananmen', 'Great Wall'],
         Shanghai: ['Oriental Pearl', 'The Bund'],
@@ -41,22 +95,63 @@ const AddCoursePage = () => {
                     <Row style={{ paddingTop: "20px" }}>
                         <Col flex={2} style={{ paddingRight: "20px" }}>
                             <Form.Item label="Course Name" name="name" required>
-                                <Input placeholder="course name" />
+                                <Input placeholder="course name" onChange={e => {
+                                    form.setFieldsValue({ name: e.target.value });
+                                    console.log(form.getFieldsValue())
+                                }} />
                             </Form.Item>
                         </Col>
                         <Col xs={{ span: 5 }} style={{ paddingRight: "20px" }}>
                             <Form.Item label="Teacher" name="teacher" required>
-                                <Input placeholder="course name" />
+                                <Select placeholder="Select teacher" onChange={value => {
+                                    form.setFieldsValue({ teacher: value });
+                                    console.log(`queryParams.page ${queryParams.page}< totalPage${totalPage}`)
+                                }}
+                                    dropdownRender={menu => (
+                                        <div>
+                                            <div style={{ textAlign: "center" }}>
+                                                {queryParams.page !== 1 ? <a onClick={() => {
+                                                    const pageNumber = queryParams.page - 1;
+                                                    setQueryParams({
+                                                        ...queryParams,
+                                                        page: pageNumber
+                                                    })
+                                                }}>Load last ten teachers</a> : null}
+                                            </div>
+                                            <Divider style={{ margin: '4px 0' }} />
+                                            {menu}
+                                            <Divider style={{ margin: '4px 0' }} />
+                                            <div style={{ textAlign: "center" }}>
+                                                {queryParams.page < totalPage ? <a onClick={() => {
+                                                    const pageNumber = queryParams.page + 1;
+                                                    setQueryParams({
+                                                        ...queryParams,
+                                                        page: pageNumber
+                                                    })
+                                                }}
+                                                    style={{}}>Load next ten teachers</a> : null}
+                                            </div>
+
+                                        </div>
+                                    )}>
+                                    {teachers?.map((teacher, key) => <Option key={key} value={teacher.id}>{teacher.name}</Option>)}
+
+
+                                </Select>
                             </Form.Item>
                         </Col>
                         <Col xs={{ span: 5 }} style={{ paddingRight: "20px" }}>
                             <Form.Item label="Type" name="type" required>
-                                <Input />
+                                <Select placeholder="Select Type" onChange={value => form.setFieldsValue({ type: value })}>
+                                    {courseType?.map((type, key) => <Option key={key} value={type.id}>{type.name}</Option>
+
+                                    )}
+                                </Select>
                             </Form.Item>
                         </Col>
                         <Col xs={{ span: 5 }}>
                             <Form.Item label="Course Code" name="code" required>
-                                <Input />
+                                <Input value={courseCode} placeholder={courseCode} disabled/>
                             </Form.Item>
                         </Col>
 
@@ -68,7 +163,7 @@ const AddCoursePage = () => {
                             </Form.Item>
 
                             <Form.Item label="Price" name="price" required>
-                                <Input prefix="$" style={{ width: '50%' }} />
+                                <InputNumber prefix="$" style={{ width: '50%' }} />
                             </Form.Item>
                             <Form.Item label="Student Limit" name="studentLimit" required>
                                 <Input style={{ width: '50%' }} />
@@ -76,9 +171,9 @@ const AddCoursePage = () => {
                             <Form.Item label="Duration" name="duration" required>
                                 <Input.Group compact>
                                     <Input style={{ width: '50%' }} />
-                                    <Select defaultValue="Zhejiang">
-                                        <Option value="Zhejiang">Zhejiang</Option>
-                                        <Option value="Jiangsu">Jiangsu</Option>
+                                    <Select defaultValue="month">
+                                        <Option value="month">Month</Option>
+                                        <Option value="day">Day</Option>
                                     </Select>
 
                                 </Input.Group>
@@ -115,14 +210,15 @@ const AddCoursePage = () => {
         } else if (stepCurrent === 1) {
             return (
                 <>
+                    <p>{() => form.getFieldsValue()}</p>
                     <Form
 
                         layout="vertical"
                         form={form}
 
                     >
-                        <Row style={{ paddingTop: "20px", paddingLeft:"20px"}}>
-                            <Col flex={2} style={{  }}>
+                        <Row style={{ paddingTop: "20px", paddingLeft: "20px" }}>
+                            <Col flex={2} style={{}}>
 
                                 <h2>Chapters</h2>
 
@@ -133,37 +229,37 @@ const AddCoursePage = () => {
                                                 <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
                                                     <Row>
                                                         <Col>
-                                                        <Form.Item
-                                                        {...restField}
-                                                        name={[name, 'chapterName']}
-                                                        rules={[{ required: true, message: 'Missing chapter name' }]}
-                                                        // style={{paddingRight:"5%"}}
-                                                    >
-                                                        <Input placeholder="Chapter Name" style={{width:"120%"}} />
-                                                    </Form.Item>
+                                                            <Form.Item
+                                                                {...restField}
+                                                                name={[name, 'chapterName']}
+                                                                rules={[{ required: true, message: 'Missing chapter name' }]}
+                                                            // style={{paddingRight:"5%"}}
+                                                            >
+                                                                <Input placeholder="Chapter Name" style={{ width: "120%" }} />
+                                                            </Form.Item>
                                                         </Col>
-                                                        <Col style={{right: "-15%"}}>
-                                                        <Form.Item
-                                                        {...restField}
-                                                        name={[name, 'chapterDescription']}
-                                                        rules={[{ required: true, message: 'Missing chapter description' }]}
-                                                    >
-                                                        <Input placeholder="Chapter Description" style={{width:"230%"}}/>
-                                                    </Form.Item>
+                                                        <Col style={{ right: "-15%" }}>
+                                                            <Form.Item
+                                                                {...restField}
+                                                                name={[name, 'chapterDescription']}
+                                                                rules={[{ required: true, message: 'Missing chapter description' }]}
+                                                            >
+                                                                <Input placeholder="Chapter Description" style={{ width: "230%" }} />
+                                                            </Form.Item>
                                                         </Col>
-                                                        <Col style={{right: "-80%", paddingTop: "1%"}}>
-                                                        <MinusCircleOutlined onClick={() => remove(name)} style={{}}/>
+                                                        <Col style={{ right: "-80%", paddingTop: "1%" }}>
+                                                            <MinusCircleOutlined onClick={() => remove(name)} style={{}} />
                                                         </Col>
                                                     </Row>
-                                                    
-                                                    
-                                                    
+
+
+
                                                 </Space>
                                             ))}
 
 
                                             <Form.Item>
-                                                <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />} style={{width:"80%"}}>
+                                                <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />} style={{ width: "80%" }}>
                                                     Add Chapter
                                                 </Button>
                                             </Form.Item>
@@ -181,55 +277,55 @@ const AddCoursePage = () => {
                                         <>
                                             {fields.map(field => (
                                                 <Row>
-                                                <Space key={field.key} align="baseline">
-                                                    <Form.Item
-                                                        noStyle
-                                                        shouldUpdate={(prevValues, curValues) =>
-                                                            prevValues.area !== curValues.area || prevValues.sights !== curValues.sights
-                                                        }
-                                                    >
-                                                        {() => (
-                                                            
+                                                    <Space key={field.key} align="baseline">
+                                                        <Form.Item
+                                                            noStyle
+                                                            shouldUpdate={(prevValues, curValues) =>
+                                                                prevValues.area !== curValues.area || prevValues.sights !== curValues.sights
+                                                            }
+                                                        >
+                                                            {() => (
+
                                                                 <Col>
-                                                                <Form.Item
-                                                                {...field}
-                                                                
-                                                                name={[field.name, 'day']}
-                                                                rules={[{ required: true, message: 'Missing class day' }]}
-                                                                style={{width:"200px"}}
-                                                            >
-                                                                <Select options={
-                                                                    [
-                                                                        { label: 'Monday', value: 'Monday' },
-                                                                        { label: 'Tuesday', value: 'Tuesday' },
-                                                                        { label: 'Wednesday', value: 'Wednesday' },
-                                                                        { label: 'Thursday', value: 'Thursday' },
-                                                                        { label: 'Friday', value: 'Friday' },
-                                                                        { label: 'Saturday', value: 'Saturday' },
-                                                                        { label: 'Sunday', value: 'Sunday' },
-                                                                    ]  
-                                                                } onChange={() => form.setFieldsValue({ ClassTimes: [] })} 
-                                                                />
-                                                            </Form.Item>
+                                                                    <Form.Item
+                                                                        {...field}
+
+                                                                        name={[field.name, 'day']}
+                                                                        rules={[{ required: true, message: 'Missing class day' }]}
+                                                                        style={{ width: "200px" }}
+                                                                    >
+                                                                        <Select options={
+                                                                            [
+                                                                                { label: 'Monday', value: 'Monday' },
+                                                                                { label: 'Tuesday', value: 'Tuesday' },
+                                                                                { label: 'Wednesday', value: 'Wednesday' },
+                                                                                { label: 'Thursday', value: 'Thursday' },
+                                                                                { label: 'Friday', value: 'Friday' },
+                                                                                { label: 'Saturday', value: 'Saturday' },
+                                                                                { label: 'Sunday', value: 'Sunday' },
+                                                                            ]
+                                                                        } onChange={() => form.setFieldsValue({ ClassTimes: [] })}
+                                                                        />
+                                                                    </Form.Item>
                                                                 </Col>
-                                                                
-                                                            
-                                                        )}
-                                                    </Form.Item>
-                                                    <Col>
-                                                    <Form.Item
-                                                        {...field}
-                                                        
-                                                        name={[field.name, 'time']}
-                                                        rules={[{ required: true, message: 'Missing class time of the day' }]}
-                                                    >
-                                                        <Input style={{width: "250%"}}/>
-                                                    </Form.Item>
-                                                    </Col>
-                                                    <Col style={{right: "-270px"}}>
-                                                    <MinusCircleOutlined onClick={() => remove(field.name)} style={{}} />
-                                                    </Col>
-                                                </Space>
+
+
+                                                            )}
+                                                        </Form.Item>
+                                                        <Col>
+                                                            <Form.Item
+                                                                {...field}
+
+                                                                name={[field.name, 'time']}
+                                                                rules={[{ required: true, message: 'Missing class time of the day' }]}
+                                                            >
+                                                                <Input style={{ width: "250%" }} />
+                                                            </Form.Item>
+                                                        </Col>
+                                                        <Col style={{ right: "-270px" }}>
+                                                            <MinusCircleOutlined onClick={() => remove(field.name)} style={{}} />
+                                                        </Col>
+                                                    </Space>
                                                 </Row>
                                             ))}
 
@@ -243,12 +339,12 @@ const AddCoursePage = () => {
                                 </Form.List>
 
                             </Col>
-                            
+
                         </Row>
-                        <Row style={{ paddingTop: "20px", paddingLeft:"20px"}}>
-                        <Button type="primary" htmlType="submit">
-                        Submit
-                    </Button>
+                        <Row style={{ paddingTop: "20px", paddingLeft: "20px" }}>
+                            <Button type="primary" htmlType="submit">
+                                Submit
+                            </Button>
                         </Row>
                     </Form>
                 </>
