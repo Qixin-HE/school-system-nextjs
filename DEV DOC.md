@@ -12,6 +12,7 @@ Work Item:
 
     a. Steps - Course Detail, Course Schedule, success
     b. input fields and related states using antd form
+    Step1:
     - Text input: Course Name, Type, Student Limit(integer), Duration, Description, Cover
     - Text input with dropdown: Duration (month, days, year)
     - Cover: image upload
@@ -19,12 +20,17 @@ Work Item:
     - Text input with date picker: Start Date(not required)
     - Auto generated text field: Course Code
     - Dropdown: Teacher
+    Step2:
+    Chapters: a list of chapter name and chapter description
+    Class Times: a list of daytime(Monday - Sunday) and time(HH:mm:ss)
 
     add course service: 
     api/courseService.ts
 
     c. postCourseService()
     d. getCourseTypes()
+    e. putCourseSchedule()
+    After posting a new course on addcourse-step1, we need to put the schedule for it which contains the chapters and classtimes
     
 //
 Features:

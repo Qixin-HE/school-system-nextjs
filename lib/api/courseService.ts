@@ -55,9 +55,11 @@ export const postCourseService = async (data: postCourse): Promise<any> => {
 
         console.log(`Printing from postCourseService - response-data:  ${JSON.stringify(status)}`)
         if (status.msg == "success") {
+            console.log(status)
             return {
                 status: true,
-                id: status.data.id,
+                courseId: status.data.id,
+                scheduleId: status.data.scheduleId,
                 name: status.data.name
             };
         } else {

@@ -1,6 +1,6 @@
 import Dashboard from "../../components/Dashboard";
 import Link from 'next/link'
-import { Breadcrumb, Button, Col, DatePicker, Divider, Form, Input, InputNumber, Layout, message, Row, Select, Space, Steps, Upload } from "antd";
+import { Breadcrumb, Button, Col, DatePicker, Divider, Form, Input, InputNumber, Layout, message, Row, Select, Space, Steps, TimePicker, Upload } from "antd";
 import { useEffect, useState } from "react";
 import TextArea from "antd/lib/input/TextArea";
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
@@ -28,6 +28,11 @@ const AddCoursePage = () => {
     const [totalPage, setTotalPage] = useState(0);
     const [courseType, setCourseType] = useState<CourseType[]>()
     const [courseCode, setCourseCode] = useState<string>();
+    
+    const [newCourseId, setNewCourseId] = useState<{
+        courseId: number,
+        scheduleId: number
+    }>();
 
 
 
@@ -50,13 +55,13 @@ const AddCoursePage = () => {
             }
             )
             setCourseCode(uuidv4());
-            form.setFieldsValue({uid: courseCode})
+            form.setFieldsValue({ uid: courseCode })
 
 
         })
 
     }, [queryParams]);
-    
+
 
     const stepStatus = (stepIndex: number) => {
         if (stepIndex < stepCurrent) {
@@ -68,31 +73,62 @@ const AddCoursePage = () => {
         }
 
     }
+    function hasNull(target:any) {
+        for (var member in target) {
+            if (target[member] == null)
+                return true;
+        }
+        return false;
+    }
 
     const onCourseDetailSubmit = () => {
         const formCourseObject = form.getFieldsValue();
         const sendCourseObject = {
-            name:  formCourseObject.name,
-            uid: formCourseObject.uid,
+            name: formCourseObject.name,
+            uid: courseCode!,
             detail: formCourseObject.detail,
-            startTime: formCourseObject.startTime.format('YYYY-MM-DD HH:mm:ss'),
+            startTime: formCourseObject.startTime && formCourseObject.startTime.format('YYYY-MM-DD HH:mm:ss'),
             price: formCourseObject.price,
             maxStudents: formCourseObject.maxStudents,
             duration: formCourseObject.duration,
             durationUnit: formCourseObject.duration,
             cover: "no cover for now  - zoe",
-            teacherId: formCourseObject.teacher,
+            teacherId: formCourseObject.teacherId,
             type: formCourseObject.type
         }
+        if (hasNull(sendCourseObject)){
+            message.error("The Course Detail may has some required values that are empty, please check.")
+            console.log(sendCourseObject)
+            return
+        }
         postCourseService(sendCourseObject).then((response) => {
+            console.log(response)
             if (response.status === true) {
-                message.success(`Course: ${response.name} with id ${response.id} has been added successfully!`);
+                message.success(`Course: ${response.name} with id ${response.courseId} has been added successfully!`);
+                setNewCourseId({
+                    courseId: response.courseId,
+                    scheduleId: response.scheduleId,
+                })
                 
+
+
             } else {
                 message.error('Something went wrong. Try again~');
             }
         })
+        if (stepCurrent < 1) {
+            setStepCurrent(1)
+        }
         
+            
+                
+        
+
+
+    }
+    const test = () => {
+        console.log(form.getFieldValue("chapters"))
+        console.log(form.getFieldValue("classTimes"))
     }
 
 
@@ -112,15 +148,15 @@ const AddCoursePage = () => {
                             <Form.Item label="Course Name" name="name" required>
                                 <Input placeholder="course name" onChange={e => {
                                     form.setFieldsValue({ name: e.target.value });
-                                    
+
                                 }} />
                             </Form.Item>
                         </Col>
                         <Col xs={{ span: 5 }} style={{ paddingRight: "20px" }}>
-                            <Form.Item label="Teacher" name="teacher" required>
+                            <Form.Item label="Teacher" name="teacherId" required>
                                 <Select placeholder="Select teacher" onChange={value => {
                                     form.setFieldsValue({ teacher: value });
-                                    
+
                                 }}
                                     dropdownRender={menu => (
                                         <div>
@@ -166,14 +202,14 @@ const AddCoursePage = () => {
                         </Col>
                         <Col xs={{ span: 5 }}>
                             <Form.Item label="Course Code" name="code" required>
-                                <Input value={courseCode} placeholder={courseCode} disabled/>
+                                <Input value={courseCode} placeholder={courseCode} disabled />
                             </Form.Item>
                         </Col>
 
                     </Row>
                     <Row>
                         <Col flex={2} style={{ paddingRight: "20px", width: "25%" }}>
-                            <Form.Item label="Start Date" name="startTime">
+                            <Form.Item label="Start Date" name="startTime" required>
                                 <DatePicker style={{ width: '90%' }} />
                             </Form.Item>
 
@@ -185,7 +221,7 @@ const AddCoursePage = () => {
                             </Form.Item>
                             <Form.Item label="Duration" name="duration" required>
                                 <Input.Group compact>
-                                    <InputNumber style={{ width: '75%' }} onChange={value => form.setFieldsValue({ duration: value })}/>
+                                    <InputNumber style={{ width: '75%' }} onChange={value => form.setFieldsValue({ duration: value })} />
                                     <Select defaultValue="month">
                                         <Option value="month">Month</Option>
                                         <Option value="day">Day</Option>
@@ -222,6 +258,20 @@ const AddCoursePage = () => {
                     <Button type="primary" htmlType="submit">
                         Submit
                     </Button>
+                    <a onClick={() => {
+                        form.setFieldsValue({
+                            name: 'zoe-test',
+                            detail: "This is a description",
+                            startTime: moment(),
+                            price: 100,
+                            maxStudents: 3,
+                            duration: 1,
+                            durationUnit: 1,
+                            cover: "zoe-test-cover",
+                            teacherId: 1,
+                            type: 9
+                        });
+                    }}>test</a>
                 </Form>
 
             </>
@@ -237,8 +287,8 @@ const AddCoursePage = () => {
                         form={form}
 
                     >
-                        <Row style={{ paddingTop: "20px", paddingLeft: "20px" }}>
-                            <Col flex={2} style={{}}>
+                        <Row style={{ paddingTop: "20px", paddingLeft: "1rem" }}>
+                            <Col flex={2} style={{width:"15rem"}}>
 
                                 <h2>Chapters</h2>
 
@@ -289,7 +339,7 @@ const AddCoursePage = () => {
                             </Col>
 
 
-                            <Col flex={2} style={{ paddingRight: "20px" }}>
+                            <Col flex={2} style={{ paddingRight: "20px",width:"15rem" }} >
 
                                 <h2>Class Times</h2>
                                 <Form.List name="classTimes">
@@ -339,10 +389,10 @@ const AddCoursePage = () => {
                                                                 name={[field.name, 'time']}
                                                                 rules={[{ required: true, message: 'Missing class time of the day' }]}
                                                             >
-                                                                <Input style={{ width: "250%" }} />
+                                                                <TimePicker defaultOpenValue={moment('09:00:00', 'HH:mm:ss')} style={{width:"25rem"}}/>
                                                             </Form.Item>
                                                         </Col>
-                                                        <Col style={{ right: "-270px" }}>
+                                                        <Col style={{}}>
                                                             <MinusCircleOutlined onClick={() => remove(field.name)} style={{}} />
                                                         </Col>
                                                     </Space>
@@ -365,6 +415,7 @@ const AddCoursePage = () => {
                             <Button type="primary" htmlType="submit">
                                 Submit
                             </Button>
+                            <a onClick={test}>test</a>
                         </Row>
                     </Form>
                 </>
