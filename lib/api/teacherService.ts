@@ -23,8 +23,7 @@ export const getTeacherListService = async (page?: number, limit?: number, query
         console.log(error);
     }).then(function () {
         var rows: any = [];
-        console.log("value from the getlist service")
-        console.log(value)
+        
         const teacherRecords: Teacher[] = value.teachers;
         teacherRecords.forEach(e => {
             const teacherItem: TeacherListRecord = {

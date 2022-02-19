@@ -1,15 +1,17 @@
 import Dashboard from "../../components/Dashboard";
 import Link from 'next/link'
-import { Breadcrumb, Button, Col, DatePicker, Divider, Form, Input, InputNumber, Layout, Row, Select, Space, Steps } from "antd";
+import { Breadcrumb, Button, Col, DatePicker, Divider, Form, Input, InputNumber, Layout, message, Row, Select, Space, Steps, Upload } from "antd";
 import { useEffect, useState } from "react";
 import TextArea from "antd/lib/input/TextArea";
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
 import { getTeacherListService } from "../../lib/api/teacherService";
-import { getCourseTypes } from "../../lib/api/courseService";
+import { getCourseTypes, postCourseService } from "../../lib/api/courseService";
 import { CourseType } from "../../lib/model/course";
 import { checkPrimeSync } from "crypto";
 import moment from "moment";
+
+import { InboxOutlined } from '@ant-design/icons';
 
 const AddCoursePage = () => {
     const { Header, Footer, Sider, Content } = Layout;
@@ -26,7 +28,7 @@ const AddCoursePage = () => {
     const [totalPage, setTotalPage] = useState(0);
     const [courseType, setCourseType] = useState<CourseType[]>()
     const [courseCode, setCourseCode] = useState<string>();
-    
+
 
 
 
@@ -42,21 +44,19 @@ const AddCoursePage = () => {
             })
             setTeachers(teacherRecordShortList);
             setTotalPage(Math.round(result.total / 10))
-            getCourseTypes().then((result) =>{
+            getCourseTypes().then((result) => {
                 setCourseType(result)
-                
+
             }
-                )
+            )
             setCourseCode(uuidv4());
+            form.setFieldsValue({uid: courseCode})
 
 
         })
 
     }, [queryParams]);
-    // useEffect(()=>{
-    //     setStartDate(`${startDate} 00:00:00`)
-
-    // },[startDate])
+    
 
     const stepStatus = (stepIndex: number) => {
         if (stepIndex < stepCurrent) {
@@ -69,25 +69,40 @@ const AddCoursePage = () => {
 
     }
 
-    // const getStartDate = (dateString : string) => {
-    //     const date = dateString;
-    //     setStartDatetime(`${date} 00:00:00`)
-    //     console.log("start date is")
-    //     console.log(startDatetime)
-    //     // form.setFieldsValue({startDate: ''})
-    //     // form.setFieldsValue({startDate: startDatetime})
-    // }
+    const onCourseDetailSubmit = () => {
+        const formCourseObject = form.getFieldsValue();
+        const sendCourseObject = {
+            name:  formCourseObject.name,
+            uid: formCourseObject.uid,
+            detail: formCourseObject.detail,
+            startTime: formCourseObject.startTime.format('YYYY-MM-DD HH:mm:ss'),
+            price: formCourseObject.price,
+            maxStudents: formCourseObject.maxStudents,
+            duration: formCourseObject.duration,
+            durationUnit: formCourseObject.duration,
+            cover: "no cover for now  - zoe",
+            teacherId: formCourseObject.teacher,
+            type: formCourseObject.type
+        }
+        postCourseService(sendCourseObject).then((response) => {
+            if (response.status === true) {
+                message.success(`Course: ${response.name} with id ${response.id} has been added successfully!`);
+                
+            } else {
+                message.error('Something went wrong. Try again~');
+            }
+        })
+        
+    }
 
-    const chapters = {
-        Beijing: ['Tiananmen', 'Great Wall'],
-        Shanghai: ['Oriental Pearl', 'The Bund'],
-    };
+
+    const { Dragger } = Upload;
 
     const returnAddCourseComponents = () => {
         if (stepCurrent === 0) {
             return (<>
                 <Form
-
+                    onFinish={onCourseDetailSubmit}
                     layout="vertical"
                     form={form}
 
@@ -97,7 +112,7 @@ const AddCoursePage = () => {
                             <Form.Item label="Course Name" name="name" required>
                                 <Input placeholder="course name" onChange={e => {
                                     form.setFieldsValue({ name: e.target.value });
-                                    console.log(form.getFieldsValue())
+                                    
                                 }} />
                             </Form.Item>
                         </Col>
@@ -105,7 +120,7 @@ const AddCoursePage = () => {
                             <Form.Item label="Teacher" name="teacher" required>
                                 <Select placeholder="Select teacher" onChange={value => {
                                     form.setFieldsValue({ teacher: value });
-                                    console.log(`queryParams.page ${queryParams.page}< totalPage${totalPage}`)
+                                    
                                 }}
                                     dropdownRender={menu => (
                                         <div>
@@ -157,44 +172,49 @@ const AddCoursePage = () => {
 
                     </Row>
                     <Row>
-                        <Col flex={2} style={{ paddingRight: "20px" }}>
-                            <Form.Item label="Start Date" name="startDate">
-                                <DatePicker style={{ width: '50%' }} />
+                        <Col flex={2} style={{ paddingRight: "20px", width: "25%" }}>
+                            <Form.Item label="Start Date" name="startTime">
+                                <DatePicker style={{ width: '90%' }} />
                             </Form.Item>
 
                             <Form.Item label="Price" name="price" required>
-                                <InputNumber prefix="$" style={{ width: '50%' }} />
+                                <InputNumber prefix="$" style={{ width: '90%' }} />
                             </Form.Item>
-                            <Form.Item label="Student Limit" name="studentLimit" required>
-                                <Input style={{ width: '50%' }} />
+                            <Form.Item label="Student Limit" name="maxStudents" required>
+                                <InputNumber style={{ width: '90%' }} />
                             </Form.Item>
                             <Form.Item label="Duration" name="duration" required>
                                 <Input.Group compact>
-                                    <Input style={{ width: '50%' }} />
+                                    <InputNumber style={{ width: '75%' }} onChange={value => form.setFieldsValue({ duration: value })}/>
                                     <Select defaultValue="month">
                                         <Option value="month">Month</Option>
                                         <Option value="day">Day</Option>
+                                        <Option value="year">Year</Option>
                                     </Select>
 
                                 </Input.Group>
                             </Form.Item>
                         </Col>
-                        <Col flex={2} style={{ paddingRight: "20px" }}>
-                            <Form.Item label="Student Limit" name="studentLimit" required>
+                        <Col flex={2} style={{ paddingRight: "20px", width: "25%" }}>
+                            <Form.Item label="Description" name="detail" required>
                                 <TextArea
-                                    placeholder="Controlled autosize"
+                                    placeholder="Course description"
                                     style={{ height: "300px" }}
                                 />
                             </Form.Item>
 
+
+
                         </Col>
                         <Col flex={2}>
-                            <Form.Item label="Cover" name="cover" required>
-                                <TextArea
+                            <Form.Item label="Cover" name="uid">
+                                <Dragger style={{ height: "18.8rem" }}>
+                                    <p className="ant-upload-drag-icon">
+                                        <InboxOutlined />
+                                    </p>
+                                    <p className="ant-upload-text">Click or drag file to this area to upload</p>
 
-                                    placeholder="Controlled autosize"
-                                    style={{ height: "300px" }}
-                                />
+                                </Dragger>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -276,7 +296,7 @@ const AddCoursePage = () => {
                                     {(fields, { add, remove }) => (
                                         <>
                                             {fields.map(field => (
-                                                <Row>
+                                                <Row key={field.key}>
                                                     <Space key={field.key} align="baseline">
                                                         <Form.Item
                                                             noStyle

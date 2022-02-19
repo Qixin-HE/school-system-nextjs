@@ -1,6 +1,6 @@
 import { getService, postService, deleteService, putService } from './baseService';
 import { AxiosResponse } from 'axios';
-import { CourseDetail, CourseType, getCourseResponse } from '../model/course';
+import { CourseDetail, CourseType, getCourseResponse, postCourse } from '../model/course';
 
 export const getCourseService = async () : Promise<any> => {
     const path = `courses`;
@@ -44,4 +44,28 @@ export const getCourseTypes = async(): Promise<any> => {
     }).then(function () {
         return value;
     })
+};
+
+export const postCourseService = async (data: postCourse): Promise<any> => {
+
+
+    return await postService("courses", data).then(function (response: AxiosResponse) {
+        const status = response.data;
+
+
+        console.log(`Printing from postCourseService - response-data:  ${JSON.stringify(status)}`)
+        if (status.msg == "success") {
+            return {
+                status: true,
+                id: status.data.id,
+                name: status.data.name
+            };
+        } else {
+            return { status: false };
+        }
+
+    })
+        .catch(function (error) {
+            console.log(error);
+        });
 };

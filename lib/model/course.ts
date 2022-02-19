@@ -64,3 +64,17 @@ interface Sales {
     studentAmount: number,
     paidIds: string[]
 }
+
+export interface postCourse {
+    name: string,
+    uid: string,
+    detail: string,
+    startTime: string,
+    price: number,
+    maxStudents: number,
+    duration: number,
+    durationUnit: number,
+    cover: string,
+    teacherId: number,
+    type: number
+}
